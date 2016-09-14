@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "summary": "Build your own interactive stories using the Elm Narrative Engine",
+    "repository": "https://github.com/jschomay/elm-interactive-story-starter.git",
+    "license": "BSD3",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "4.0.0 <= v < 5.0.0",
+        "jschomay/elm-narrative-engine": "1.0.0 <= v < 2.0.0"
+    },
+    "elm-version": "0.17.0 <= v < 0.18.0"
+}
