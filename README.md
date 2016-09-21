@@ -17,7 +17,7 @@ Build your story for distribution (in `/dist/`) with `npm build`.
 
 This story starter comes with a short example story template to get you started.  You will find all the files you need in the `/src/` directory.  Just modify them with your own content.
 
-The section below explains the main concepts for telling your story.  Also refer to the [package documentation]((http://package.elm-lang.org/packages/jschomay/elm-narrative-engine) for the docs on everything that you can do.
+The section below explains the main concepts for telling your story.  Also refer to the [package documentation](http://package.elm-lang.org/packages/jschomay/elm-narrative-engine) for the docs on everything that you can do.
 
 ### Concepts
 
