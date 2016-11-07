@@ -149,6 +149,12 @@ bringMarbleHome =
       , narration =
             [ "This will be safe here." ]
       }
+    , { interaction = withLocation Home
+      , conditions = [ withInventory GreenMarble ]
+      , changes = [ moveTo Home, placeItem GreenMarble Home ]
+      , narration =
+            [ "This will be safe here." ]
+      }
     , { interaction = withAnything
       , conditions = [ inLocation Home ]
       , changes = []
