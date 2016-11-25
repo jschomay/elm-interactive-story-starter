@@ -123,7 +123,7 @@ img {
   text-align: center;
   color: white;
   background-color: #555;
-  margin-bottom: 15px;
+  margin-bottom: 30px;
   text-transform: capitalize;
 }
 
@@ -151,19 +151,17 @@ img {
 .Storyline__Item {
   opacity: 0.3;
   width: 600px;
-  transition: padding-left 0.1s;
-  padding: 10px;
+  padding: 20px 10px;
   position: relative;
+  border-bottom: 1px solid #ccc;
 }
 
 .Storyline__Item:first-of-type {
-  padding-left: 40px;
-}
-
-.Storyline__Item:first-of-type:before {
-  float: left;
-  content: '\25B8';
-  margin: 0px -25px;
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  padding: 50px 0;
+  font-size: 140%;
+  margin: 40px 0 80px 0;
 }
 
 .Storyline__Item__Action {
@@ -176,16 +174,12 @@ img {
 
 
 .Storyline__Item__Rollback {
-  opacity: 0.01;
-  position: absolute;
-  right: 0px;
-  top: 30px;
-  width: 5px;
-  cursor: pointer;
-}
-
-.Storyline__Item:hover .Storyline__Item__Rollback {
   opacity: 0.2;
+  position: absolute;
+  right: -30px;
+  top: 30px;
+  width: 30px;
+  cursor: pointer;
 }
 
 .Storyline__Item:hover .Storyline__Item__Rollback:hover {
@@ -240,10 +234,6 @@ img {
   flex: 0 0 auto;
 }
 
-.u-new-story-interactable {
-  font-style: italic;
-}
-
 .u-selectable:hover {
   cursor: pointer;
   text-decoration: underline;
@@ -255,11 +245,6 @@ img {
   overflow: hidden;
   animation: fadeIn 0.7s linear forwards,
   slideDown 3s ease-out forwards;
-}
-
-.u-jump {
-  padding-left: 0px;
-  animation: jump alternate 0.1s 2 ease-out forwards;
 }
 
 @keyframes fadeIn {
@@ -274,8 +259,3 @@ img {
   }
 }
 
-@keyframes jump {
-  to {
-    padding-left: 10px;
-  }
-}
