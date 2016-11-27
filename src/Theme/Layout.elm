@@ -34,8 +34,9 @@ view world engineModel =
         story =
             Story.getStoryLine world engineModel
     in
-        div [ class "GamePage" ]
-            [ div [ class "Layout" ]
+        div [ class <| "GamePage" ]
+            [ div [ class <| "GamePage__background GamePage__background--" ++ (.name <| world.locations currentLocation) ] []
+            , div [ class "Layout" ]
                 [ div [ class "Layout__Main" ]
                     [ Theme.CurrentSummary.view world
                         currentLocation

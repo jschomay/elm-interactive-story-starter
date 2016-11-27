@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Story exposing (..)
 import World exposing (..)
@@ -12,6 +12,7 @@ import Theme.Layout
 type alias Model =
     { engineModel : Story.Model MyItem MyLocation MyCharacter MyKnowledge
     , route : Route
+    , loaded : Bool
     }
 
 
@@ -23,22 +24,27 @@ type Route
 type Msg
     = EngineUpdate (Story.Msg MyItem MyLocation MyCharacter)
     | StartGame
+    | Loaded
 
 
 main : Program Never
 main =
-    Html.beginnerProgram
-        { model = init
+    Html.program
+        { init = init
         , view = view
         , update = update
+        , subscriptions = subscriptions
         }
 
 
-init : Model
+init : ( Model, Cmd Msg )
 init =
-    { engineModel = Story.init setup
-    , route = TitlePage
-    }
+    ( { engineModel = Story.init setup
+      , route = TitlePage
+      , loaded = False
+      }
+    , Cmd.none
+    )
 
 
 world : World MyItem MyLocation MyCharacter
@@ -65,14 +71,31 @@ setup =
 update :
     Msg
     -> Model
-    -> Model
+    -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         EngineUpdate engineMsg ->
-            { model | engineModel = Story.update engineMsg model.engineModel }
+            ( { model | engineModel = Story.update engineMsg model.engineModel }
+            , Cmd.none
+            )
 
         StartGame ->
-            { model | route = GamePage }
+            ( { model | route = GamePage }
+            , Cmd.none
+            )
+
+        Loaded ->
+            ( { model | loaded = True }
+            , Cmd.none
+            )
+
+
+port loaded : (Bool -> msg) -> Sub msg
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    loaded <| always Loaded
 
 
 view :
@@ -81,7 +104,7 @@ view :
 view model =
     case model.route of
         TitlePage ->
-            Theme.TitlePage.view StartGame
+            Theme.TitlePage.view StartGame model.loaded
 
         GamePage ->
             Html.map EngineUpdate <| Theme.Layout.view world model.engineModel

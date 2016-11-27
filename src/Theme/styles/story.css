@@ -1,0 +1,15 @@
+.GamePage__background--Home {
+	background-image: url("/img/Home.jpg");
+}
+
+.GamePage__background--Garden {
+  background-image: url("/img/Garden.jpg");
+}
+
+.GamePage__background--Marsh {
+	background-image: url("/img/Marsh.jpg");
+}
+
+.GamePage__background--Pub {
+	background-image: url("/img/Pub.jpg");
+}

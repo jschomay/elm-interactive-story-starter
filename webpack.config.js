@@ -19,6 +19,12 @@ var commonConfig = {
     filename: '[hash].js',
   },
 
+  images: {
+    assetsPath: path.resolve(__dirname, 'src/img/'),
+    rewritePath: "img/",
+    ignore: [],
+  },
+
   resolve: {
     modulesDirectories: ['node_modules'],
     extensions:         ['', '.js', '.elm']
@@ -30,6 +36,10 @@ var commonConfig = {
       {
         test: /\.(eot|ttf|woff|woff2|svg)$/,
         loader: 'file-loader'
+      },
+      {
+        test: /\.(jpg|png)$/,
+        loader: 'file-loader?name=[path][name].[ext]'
       }
     ]
   },
