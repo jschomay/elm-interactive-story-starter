@@ -1,12 +1,12 @@
 module Scenes exposing (..)
 
-import World exposing (..)
-import Story exposing (..)
+import Manifest exposing (..)
+import Engine exposing (..)
 
 
 {-| "Scene 1"
 -}
-learnOfMystery : List (Story.Rule MyItem MyLocation MyCharacter MyKnowledge)
+learnOfMystery : List (Engine.Rule MyItem MyLocation MyCharacter MyKnowledge)
 learnOfMystery =
     [ { interaction = withCharacter Harry
       , conditions = [ inLocation Garden ]
@@ -39,7 +39,7 @@ learnOfMystery =
 
 {-| "Scene 2"
 -}
-searchForMarbles : List (Story.Rule MyItem MyLocation MyCharacter MyKnowledge)
+searchForMarbles : List (Engine.Rule MyItem MyLocation MyCharacter MyKnowledge)
 searchForMarbles =
     [ -- returning marbles
       { interaction = withCharacter Harry
@@ -141,7 +141,7 @@ searchForMarbles =
 
 {-| "Ending 1"
 -}
-bringMarbleHome : List (Story.Rule MyItem MyLocation MyCharacter MyKnowledge)
+bringMarbleHome : List (Engine.Rule MyItem MyLocation MyCharacter MyKnowledge)
 bringMarbleHome =
     [ { interaction = withLocation Home
       , conditions = [ withInventory RedMarble ]
@@ -194,7 +194,7 @@ bringMarbleHome =
 
 {-| "Ending 2"
 -}
-goToPub : List (Story.Rule MyItem MyLocation MyCharacter MyKnowledge)
+goToPub : List (Engine.Rule MyItem MyLocation MyCharacter MyKnowledge)
 goToPub =
     [ { interaction = withLocation Pub
       , conditions = [ unless (inLocation Pub) ]

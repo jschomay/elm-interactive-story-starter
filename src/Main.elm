@@ -1,7 +1,7 @@
 port module Main exposing (..)
 
-import Story exposing (..)
-import World exposing (..)
+import Engine exposing (..)
+import Manifest exposing (..)
 import Scenes exposing (..)
 import Html exposing (..)
 import Html.App as Html
@@ -10,7 +10,7 @@ import Theme.Layout
 
 
 type alias Model =
-    { engineModel : Story.Model MyItem MyLocation MyCharacter MyKnowledge
+    { engineModel : Engine.Model MyItem MyLocation MyCharacter MyKnowledge
     , route : Route
     , loaded : Bool
     }
@@ -22,7 +22,7 @@ type Route
 
 
 type Msg
-    = EngineUpdate (Story.Msg MyItem MyLocation MyCharacter)
+    = EngineUpdate (Engine.Msg MyItem MyLocation MyCharacter)
     | StartGame
     | Loaded
 
@@ -39,7 +39,7 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { engineModel = Story.init setup
+    ( { engineModel = Engine.init setup
       , route = TitlePage
       , loaded = False
       }
@@ -49,7 +49,7 @@ init =
 
 world : World MyItem MyLocation MyCharacter
 world =
-    Story.world items locations characters
+    Engine.world items locations characters
 
 
 setup : StartingState MyItem MyLocation MyCharacter MyKnowledge
@@ -75,7 +75,7 @@ update :
 update msg model =
     case msg of
         EngineUpdate engineMsg ->
-            ( { model | engineModel = Story.update engineMsg model.engineModel }
+            ( { model | engineModel = Engine.update engineMsg model.engineModel }
             , Cmd.none
             )
 

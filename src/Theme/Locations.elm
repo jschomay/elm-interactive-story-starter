@@ -4,15 +4,15 @@ import Html exposing (..)
 import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Story
-import World exposing (..)
+import Engine
+import Manifest exposing (..)
 
 
 view :
-    Story.World MyItem MyLocation MyCharacter
+    Engine.World MyItem MyLocation MyCharacter
     -> List MyLocation
     -> MyLocation
-    -> Html (Story.Msg MyItem MyLocation MyCharacter)
+    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
 view world locations currentLocation =
     let
         classes location =
@@ -33,7 +33,7 @@ view world locations currentLocation =
                 ( key
                 , li
                     ([ classes location
-                     , onClick <| Story.locationMsg location
+                     , onClick <| Engine.locationMsg location
                      ]
                     )
                     [ text <| .name <| world.locations location ]

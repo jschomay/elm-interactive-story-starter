@@ -3,16 +3,16 @@ module Theme.CurrentSummary exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Story
-import World exposing (..)
+import Engine
+import Manifest exposing (..)
 
 
 view :
-    Story.World MyItem MyLocation MyCharacter
+    Engine.World MyItem MyLocation MyCharacter
     -> MyLocation
     -> List MyItem
     -> List MyCharacter
-    -> Html (Story.Msg MyItem MyLocation MyCharacter)
+    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
 view world currentLocation props characters =
     let
         isEmpty =
@@ -42,7 +42,7 @@ view world currentLocation props characters =
         charactersList =
             if not <| List.isEmpty characters then
                 characters
-                    |> List.map (interactableView (world.characters >> .name) Story.characterMsg)
+                    |> List.map (interactableView (world.characters >> .name) Engine.characterMsg)
                     |> format
                     |> (::) (text "Characters here: ")
                     |> p []
@@ -52,7 +52,7 @@ view world currentLocation props characters =
         propsList =
             if not <| List.isEmpty props then
                 props
-                    |> List.map (interactableView (world.items >> .name) Story.itemMsg)
+                    |> List.map (interactableView (world.items >> .name) Engine.itemMsg)
                     |> format
                     |> (::) (text "Items here: ")
                     |> p []

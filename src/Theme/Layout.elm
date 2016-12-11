@@ -6,33 +6,33 @@ import Theme.CurrentSummary exposing (..)
 import Theme.Storyline exposing (..)
 import Theme.Locations exposing (..)
 import Theme.Inventory exposing (..)
-import Story
-import World exposing (..)
+import Engine
+import Manifest exposing (..)
 
 
 view :
-    Story.World MyItem MyLocation MyCharacter
-    -> Story.Model MyItem MyLocation MyCharacter MyKnowledge
-    -> Html (Story.Msg MyItem MyLocation MyCharacter)
+    Engine.World MyItem MyLocation MyCharacter
+    -> Engine.Model MyItem MyLocation MyCharacter MyKnowledge
+    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
 view world engineModel =
     let
         currentLocation =
-            Story.getCurrentLocation world engineModel
+            Engine.getCurrentLocation world engineModel
 
         props =
-            Story.getNearByProps world engineModel
+            Engine.getNearByProps world engineModel
 
         characters =
-            Story.getNearByCharacters world engineModel
+            Engine.getNearByCharacters world engineModel
 
         locations =
-            Story.getLocations world engineModel
+            Engine.getLocations world engineModel
 
         inventory =
-            Story.getInventory world engineModel
+            Engine.getInventory world engineModel
 
         story =
-            Story.getStoryLine world engineModel
+            Engine.getStoryLine world engineModel
     in
         div [ class <| "GamePage" ]
             [ div [ class <| "GamePage__background GamePage__background--" ++ (.name <| world.locations currentLocation) ] []

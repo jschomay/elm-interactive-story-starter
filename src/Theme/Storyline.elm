@@ -5,11 +5,11 @@ import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Markdown
-import World exposing (..)
-import Story
+import Manifest exposing (..)
+import Engine
 
 
-view : List ( String, String ) -> Html (Story.Msg MyItem MyLocation MyCharacter)
+view : List ( String, String ) -> Html (Engine.Msg MyItem MyLocation MyCharacter)
 view storyLine =
     let
         storyLi i ( interactableName, storyText ) =
@@ -36,7 +36,7 @@ view storyLine =
                         [ span
                             [ class "Storyline__Item__Rollback"
                             , title "Reset story to this point"
-                            , onClick <| Story.rollbackMsg (numLines - i - 1)
+                            , onClick <| Engine.rollbackMsg (numLines - i - 1)
                             ]
                             []
                         ]

@@ -4,14 +4,14 @@ import Html exposing (..)
 import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import World exposing (..)
-import Story
+import Manifest exposing (..)
+import Engine
 
 
 view :
-    Story.World MyItem MyLocation MyCharacter
+    Engine.World MyItem MyLocation MyCharacter
     -> List MyItem
-    -> Html (Story.Msg MyItem MyLocation MyCharacter)
+    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
 view world items =
     let
         numItems =
@@ -25,7 +25,7 @@ view world items =
                 ( key
                 , li
                     [ class "Inventory__Item u-selectable"
-                    , onClick <| Story.itemMsg item
+                    , onClick <| Engine.itemMsg item
                     ]
                     [ text <| .name <| world.items item ]
                 )
