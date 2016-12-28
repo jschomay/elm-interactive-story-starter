@@ -4,20 +4,18 @@ import Html exposing (..)
 import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Manifest exposing (..)
 import Engine
 
 
 view :
-    Engine.World MyItem MyLocation MyCharacter
-    -> List MyItem
-    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
-view world items =
+    List ( String, { a | name : String } )
+    -> Html (Engine.Msg)
+view items =
     let
         numItems =
             List.length items
 
-        inventoryItem i item =
+        inventoryItem i ( item, attrs ) =
             let
                 key =
                     (toString item) ++ (toString <| numItems - i)
@@ -25,9 +23,9 @@ view world items =
                 ( key
                 , li
                     [ class "Inventory__Item u-selectable"
-                    , onClick <| Engine.itemMsg item
+                    , onClick <| Engine.interactMsg item
                     ]
-                    [ text <| .name <| world.items item ]
+                    [ text <| .name <| attrs ]
                 )
     in
         div [ class "Inventory" ]

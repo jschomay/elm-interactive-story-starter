@@ -7,49 +7,43 @@ import Theme.Storyline exposing (..)
 import Theme.Locations exposing (..)
 import Theme.Inventory exposing (..)
 import Engine
-import Manifest exposing (..)
 
 
 view :
-    Engine.World MyItem MyLocation MyCharacter
-    -> Engine.Model MyItem MyLocation MyCharacter MyKnowledge
-    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
-view world engineModel =
+    Engine.Model
+    -> Html Engine.Msg
+view engineModel =
     let
         currentLocation =
-            Engine.getCurrentLocation world engineModel
+            Engine.getCurrentLocation engineModel
+                |> Maybe.withDefault ( "error", { description = "error", name = "error" } )
 
         props =
-            Engine.getNearByProps world engineModel
+            Engine.getItemsInLocation engineModel
 
         characters =
-            Engine.getNearByCharacters world engineModel
+            Engine.getCharactersInLocation engineModel
 
         locations =
-            Engine.getLocations world engineModel
+            Engine.getLocations engineModel
 
         inventory =
-            Engine.getInventory world engineModel
+            Engine.getItemsInInventory engineModel
 
         story =
-            Engine.getStoryLine world engineModel
+            Engine.getStoryLine engineModel
     in
         div [ class <| "GamePage" ]
-            [ div [ class <| "GamePage__background GamePage__background--" ++ (.name <| world.locations currentLocation) ] []
+            [ div [ class <| "GamePage__background GamePage__background--" ++ (fst currentLocation) ] []
             , div [ class "Layout" ]
                 [ div [ class "Layout__Main" ]
-                    [ Theme.CurrentSummary.view world
-                        currentLocation
-                        props
-                        characters
+                    [ Theme.CurrentSummary.view currentLocation props characters
                     , Theme.Storyline.view story
                     ]
                 , div [ class "Layout__Sidebar" ]
-                    [ Theme.Locations.view world
-                        locations
+                    [ Theme.Locations.view locations
                         currentLocation
-                    , Theme.Inventory.view world
-                        inventory
+                    , Theme.Inventory.view inventory
                     ]
                 ]
             ]

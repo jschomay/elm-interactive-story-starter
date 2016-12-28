@@ -10,7 +10,7 @@ import Theme.Layout
 
 
 type alias Model =
-    { engineModel : Engine.Model MyItem MyLocation MyCharacter MyKnowledge
+    { engineModel : Engine.Model
     , route : Route
     , loaded : Bool
     }
@@ -22,7 +22,7 @@ type Route
 
 
 type Msg
-    = EngineUpdate (Engine.Msg MyItem MyLocation MyCharacter)
+    = EngineUpdate (Engine.Msg)
     | StartGame
     | Loaded
 
@@ -39,33 +39,26 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { engineModel = Engine.init setup
+    ( { engineModel =
+            Engine.init
+                { items = items
+                , locations = locations
+                , characters = characters
+                }
+                scenes
+                [ moveItemToInventory "Umbrella"
+                , moveItem "VegatableGarden" "Garden"
+                , addLocation "Home"
+                , addLocation "Garden"
+                , moveCharacter "Harry" "Garden"
+                , moveItem "Pint" "Pub"
+                , moveTo "Home"
+                ]
       , route = TitlePage
       , loaded = False
       }
     , Cmd.none
     )
-
-
-world : World MyItem MyLocation MyCharacter
-world =
-    Engine.world items locations characters
-
-
-setup : StartingState MyItem MyLocation MyCharacter MyKnowledge
-setup =
-    { startingScene = learnOfMystery
-    , startingLocation = Home
-    , startingNarration = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
-    , setupCommands =
-        [ addInventory Umbrella
-        , placeItem VegatableGarden Garden
-        , addLocation Home
-        , addLocation Garden
-        , moveCharacter Harry Garden
-        , placeItem Pint Pub
-        ]
-    }
 
 
 update :
@@ -107,4 +100,4 @@ view model =
             Theme.TitlePage.view StartGame model.loaded
 
         GamePage ->
-            Html.map EngineUpdate <| Theme.Layout.view world model.engineModel
+            Html.map EngineUpdate <| Theme.Layout.view model.engineModel

@@ -5,15 +5,13 @@ import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Engine
-import Manifest exposing (..)
 
 
 view :
-    Engine.World MyItem MyLocation MyCharacter
-    -> List MyLocation
-    -> MyLocation
-    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
-view world locations currentLocation =
+    List ( String, { name : String, description : String } )
+    -> ( String, { name : String, description : String } )
+    -> Html Engine.Msg
+view locations ( currentLocation, _ ) =
     let
         classes location =
             classList
@@ -25,7 +23,7 @@ view world locations currentLocation =
         numLocations =
             List.length locations
 
-        locationItem i location =
+        locationItem i ( location, { name, description } ) =
             let
                 key =
                     (toString location) ++ (toString <| numLocations - i)
@@ -33,10 +31,10 @@ view world locations currentLocation =
                 ( key
                 , li
                     ([ classes location
-                     , onClick <| Engine.locationMsg location
+                     , onClick <| Engine.interactMsg location
                      ]
                     )
-                    [ text <| .name <| world.locations location ]
+                    [ text <| name ]
                 )
     in
         div [ class "Locations" ]

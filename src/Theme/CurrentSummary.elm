@@ -4,26 +4,24 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Engine
-import Manifest exposing (..)
 
 
 view :
-    Engine.World MyItem MyLocation MyCharacter
-    -> MyLocation
-    -> List MyItem
-    -> List MyCharacter
-    -> Html (Engine.Msg MyItem MyLocation MyCharacter)
-view world currentLocation props characters =
+    ( String, { a | name : String } )
+    -> List ( String, { a | name : String } )
+    -> List ( String, { a | name : String } )
+    -> Html (Engine.Msg)
+view ( _, currentLocationAttrs ) props characters =
     let
         isEmpty =
             List.isEmpty characters && List.isEmpty props
 
-        interactableView toName msg interactable =
+        interactableView msg ( interactable, attrs ) =
             span
                 [ class "CurrentSummary__StoryElement u-selectable"
                 , onClick <| msg interactable
                 ]
-                [ text <| toName interactable ]
+                [ text <| .name attrs ]
 
         format list =
             let
@@ -42,7 +40,7 @@ view world currentLocation props characters =
         charactersList =
             if not <| List.isEmpty characters then
                 characters
-                    |> List.map (interactableView (world.characters >> .name) Engine.characterMsg)
+                    |> List.map (interactableView Engine.interactMsg)
                     |> format
                     |> (::) (text "Characters here: ")
                     |> p []
@@ -52,7 +50,7 @@ view world currentLocation props characters =
         propsList =
             if not <| List.isEmpty props then
                 props
-                    |> List.map (interactableView (world.items >> .name) Engine.itemMsg)
+                    |> List.map (interactableView Engine.interactMsg)
                     |> format
                     |> (::) (text "Items here: ")
                     |> p []
@@ -61,7 +59,7 @@ view world currentLocation props characters =
     in
         div [ class "CurrentSummary", style [] ]
             <| [ h1 [ class "Current-location" ]
-                    [ text <| .name <| world.locations currentLocation ]
+                    [ text <| .name <| currentLocationAttrs ]
                ]
             ++ if isEmpty then
                 [ text "Nothing here." ]
