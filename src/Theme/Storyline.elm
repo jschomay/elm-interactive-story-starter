@@ -34,10 +34,10 @@ view storyLine =
                     ]
             in
                 ( key
-                , li [ classList classes ]
-                    <| [ h4 [ class "Storyline__Item__Action" ] <| [ text name ]
-                       , Markdown.toHtml [ class "Storyline__Item__Narration markdown-body" ] (Maybe.withDefault description storyText)
-                       ]
+                , li [ classList classes ] <|
+                    [ h4 [ class "Storyline__Item__Action" ] <| [ text name ]
+                    , Markdown.toHtml [ class "Storyline__Item__Narration markdown-body" ] (Maybe.withDefault description storyText)
+                    ]
                   -- ++ if i == 0 then
                   --     []
                   --    else

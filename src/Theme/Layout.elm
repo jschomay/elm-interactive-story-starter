@@ -34,7 +34,7 @@ view engineModel =
             Engine.getStoryLine engineModel
     in
         div [ class <| "GamePage" ]
-            [ div [ class <| "GamePage__background GamePage__background--" ++ (fst currentLocation) ] []
+            [ div [ class <| "GamePage__background GamePage__background--" ++ (Tuple.first currentLocation) ] []
             , div [ class "Layout" ]
                 [ div [ class "Layout__Main" ]
                     [ Theme.CurrentSummary.view currentLocation props characters

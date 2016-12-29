@@ -4,7 +4,6 @@ import Engine exposing (..)
 import Manifest exposing (..)
 import Scenes exposing (..)
 import Html exposing (..)
-import Html.App as Html
 import Theme.TitlePage
 import Theme.Layout
 
@@ -22,12 +21,12 @@ type Route
 
 
 type Msg
-    = EngineUpdate (Engine.Msg)
+    = EngineUpdate Engine.Msg
     | StartGame
     | Loaded
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
     Html.program
         { init = init

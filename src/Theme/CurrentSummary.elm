@@ -10,7 +10,7 @@ view :
     ( String, { a | name : String } )
     -> List ( String, { a | name : String } )
     -> List ( String, { a | name : String } )
-    -> Html (Engine.Msg)
+    -> Html Engine.Msg
 view ( _, currentLocationAttrs ) props characters =
     let
         isEmpty =
@@ -57,11 +57,11 @@ view ( _, currentLocationAttrs ) props characters =
             else
                 span [] []
     in
-        div [ class "CurrentSummary", style [] ]
-            <| [ h1 [ class "Current-location" ]
-                    [ text <| .name <| currentLocationAttrs ]
-               ]
-            ++ if isEmpty then
-                [ text "Nothing here." ]
-               else
-                [ charactersList, propsList ]
+        div [ class "CurrentSummary", style [] ] <|
+            [ h1 [ class "Current-location" ]
+                [ text <| .name <| currentLocationAttrs ]
+            ]
+                ++ if isEmpty then
+                    [ text "Nothing here." ]
+                   else
+                    [ charactersList, propsList ]

@@ -9,7 +9,7 @@ import Engine
 
 view :
     List ( String, { a | name : String } )
-    -> Html (Engine.Msg)
+    -> Html Engine.Msg
 view items =
     let
         numItems =
