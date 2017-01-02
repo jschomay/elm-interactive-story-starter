@@ -52,6 +52,7 @@ init =
                 , moveCharacter "Harry" "Garden"
                 , moveItem "Pint" "Pub"
                 , moveTo "Home"
+                , loadScene "learnOfMystery"
                 ]
       , route = TitlePage
       , loaded = False

@@ -4,6 +4,7 @@ module Manifest exposing (items, locations, characters)
 items : List ( String, { name : String, description : String } )
 items =
     [ ( "Umbrella", { name = "Umbrella", description = "My trusty brolly -- I take it everywhere." } )
+    , ( "Rain", { name = "Rain", description = "I don't mind the rain really, unless I've forgotten my brolly." } )
     , ( "RedMarble", { name = "Red Marble", description = "Harry's marble!  It's lovely, isn't it?" } )
     , ( "GreenMarble", { name = "Green Marble", description = "Harry's marble!  It's lovely, isn't it?" } )
     , ( "SomethingRedAndShiny", { name = "Something shiny", description = "What is that?  Is it...?  It's a marble!" } )
