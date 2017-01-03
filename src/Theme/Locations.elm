@@ -9,9 +9,9 @@ import Engine
 
 view :
     List ( String, { name : String, description : String } )
-    -> ( String, { name : String, description : String } )
+    -> String
     -> Html Engine.Msg
-view locations ( currentLocation, _ ) =
+view locations currentLocation =
     let
         classes location =
             classList

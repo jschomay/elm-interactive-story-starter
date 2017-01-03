@@ -100,4 +100,31 @@ view model =
             Theme.TitlePage.view StartGame model.loaded
 
         GamePage ->
-            Html.map EngineUpdate <| Theme.Layout.view model.engineModel
+            let
+                displayState =
+                    { currentLocation =
+                        Engine.getCurrentLocation model.engineModel
+                    , itemsInCurrentLocation =
+                        Engine.getItemsInCurrentLocation model.engineModel
+                    , charactersInCurrentLocation =
+                        Engine.getCharactersInCurrentLocation model.engineModel
+                    , locations =
+                        Engine.getLocations model.engineModel
+                    , itemsInInventory =
+                        Engine.getItemsInInventory model.engineModel
+                    , ending =
+                        Engine.getEnding model.engineModel
+                    , storyLine =
+                        Engine.getStoryLine model.engineModel
+                            ++ ( ""
+                               , Nothing
+                               , Just
+                                    { name = "Begining"
+                                    , description = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
+                                    }
+                               , Nothing
+                               )
+                            :: []
+                    }
+            in
+                Html.map EngineUpdate <| Theme.Layout.view displayState

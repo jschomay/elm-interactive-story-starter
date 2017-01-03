@@ -6,56 +6,51 @@ import Theme.CurrentSummary exposing (..)
 import Theme.Storyline exposing (..)
 import Theme.Locations exposing (..)
 import Theme.Inventory exposing (..)
+import Types exposing (..)
 import Engine
 
 
 view :
-    Engine.Model
+    { currentLocation : Maybe ( String, Attributes )
+    , itemsInCurrentLocation : List ( String, Attributes )
+    , charactersInCurrentLocation : List ( String, Attributes )
+    , locations : List ( String, Attributes )
+    , itemsInInventory : List ( String, Attributes )
+    , ending : Maybe String
+    , storyLine : List ( String, Maybe String, Maybe Attributes, Maybe String )
+    }
     -> Html Engine.Msg
-view engineModel =
-    let
-        currentLocation =
-            Engine.getCurrentLocation engineModel
-                |> Maybe.withDefault ( "error", { description = "error", name = "error" } )
+view displayState =
+    div [ class <| "GamePage" ]
+        [ div
+            [ class <|
+                "GamePage__background GamePage__background--"
+                    ++ (Tuple.first <| Maybe.withDefault ( "none", { name = "", description = "" } ) displayState.currentLocation)
+            ]
+            []
+        , div [ class "Layout" ]
+            [ div [ class "Layout__Main" ] <|
+                (case displayState.currentLocation of
+                    Nothing ->
+                        []
 
-        props =
-            Engine.getItemsInLocation engineModel
-
-        characters =
-            Engine.getCharactersInLocation engineModel
-
-        locations =
-            Engine.getLocations engineModel
-
-        inventory =
-            Engine.getItemsInInventory engineModel
-
-        ending =
-            Engine.getTheEnd engineModel
-
-        story =
-            Engine.getStoryLine engineModel
-                ++ ( ""
-                   , Nothing
-                   , Just
-                        { name = "Begining"
-                        , description = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
-                        }
-                   , Nothing
-                   )
-                :: []
-    in
-        div [ class <| "GamePage" ]
-            [ div [ class <| "GamePage__background GamePage__background--" ++ (Tuple.first currentLocation) ] []
-            , div [ class "Layout" ]
-                [ div [ class "Layout__Main" ]
-                    [ Theme.CurrentSummary.view currentLocation props characters
-                    , Theme.Storyline.view story ending
-                    ]
-                , div [ class "Layout__Sidebar" ]
-                    [ Theme.Locations.view locations
-                        currentLocation
-                    , Theme.Inventory.view inventory
-                    ]
+                    Just currentLocation ->
+                        [ Theme.CurrentSummary.view
+                            currentLocation
+                            displayState.itemsInCurrentLocation
+                            displayState.charactersInCurrentLocation
+                        ]
+                )
+                    ++ [ Theme.Storyline.view
+                            displayState.storyLine
+                            displayState.ending
+                       ]
+            , div [ class "Layout__Sidebar" ]
+                [ Theme.Locations.view
+                    displayState.locations
+                    (Maybe.withDefault "none" <| Maybe.map Tuple.first displayState.currentLocation)
+                , Theme.Inventory.view
+                    displayState.itemsInInventory
                 ]
             ]
+        ]
