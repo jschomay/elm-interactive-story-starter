@@ -8,12 +8,9 @@ import Markdown
 import Engine exposing (..)
 
 
-view : List ( String, Maybe String, Maybe { name : String, description : String }, Maybe String ) -> Html Engine.Msg
-view storyLine =
+view : List ( String, Maybe String, Maybe { name : String, description : String }, Maybe String ) -> Maybe String -> Html Engine.Msg
+view storyLine ending =
     let
-        x =
-            Debug.log "s" storyLine
-
         storyLi i ( scene, rule, attrs, storyText ) =
             let
                 numLines =
@@ -38,6 +35,13 @@ view storyLine =
                     [ h4 [ class "Storyline__Item__Action" ] <| [ text name ]
                     , Markdown.toHtml [ class "Storyline__Item__Narration markdown-body" ] (Maybe.withDefault description storyText)
                     ]
+                        ++ if i == 0 && ending /= Nothing then
+                            [ h5
+                                [ class "Storyline__Item__Ending" ]
+                                [ text <| Maybe.withDefault "The End" ending ]
+                            ]
+                           else
+                            []
                   -- ++ if i == 0 then
                   --     []
                   --    else

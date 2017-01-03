@@ -18,9 +18,9 @@ learnOfMystery =
     []
         ++ ( "get note from harry"
            , { interaction = withCharacter "Harry"
-             , conditions = [ isInLocation "Garden" ]
+             , conditions = [ currentLocationIs "Garden" ]
              , changes =
-                [ moveCharacter "Harry" "Marsh"
+                [ moveCharacterToLocation "Harry" "Marsh"
                 , moveItemToInventory "NoteFromHarry"
                 ]
              , narration = [ harryGivesNote ]
@@ -45,7 +45,7 @@ learnOfMystery =
            )
         :: ( "harry asks for help"
            , { interaction = withCharacter "Harry"
-             , conditions = [ isInLocation "Marsh" ]
+             , conditions = [ currentLocationIs "Marsh" ]
              , changes = [ loadScene "searchForMarbles" ]
              , narration = [ harryAsksForHelp ]
              }
@@ -59,7 +59,7 @@ searchForMarbles =
         ++ ( "more about marbles"
            , { interaction = withCharacter "Harry"
              , conditions =
-                [ isInLocation "Marsh"
+                [ currentLocationIs "Marsh"
                 , itemIsNotInInventory "RedMarble"
                 , itemIsNotInInventory "GreenMarble"
                 ]
@@ -70,7 +70,7 @@ searchForMarbles =
         :: ( "show both marbles"
            , { interaction = withCharacter "Harry"
              , conditions =
-                [ isInLocation "Marsh"
+                [ currentLocationIs "Marsh"
                 , itemIsInInventory "RedMarble"
                 , itemIsInInventory "GreenMarble"
                 ]
@@ -86,7 +86,7 @@ searchForMarbles =
         :: ( "show red marble"
            , { interaction = withCharacter "Harry"
              , conditions =
-                [ isInLocation "Marsh"
+                [ currentLocationIs "Marsh"
                 , itemIsInInventory "RedMarble"
                 ]
              , changes = [ loadScene "bringMarbleHome" ]
@@ -96,34 +96,53 @@ searchForMarbles =
         :: ( "show green marble"
            , { interaction = withCharacter "Harry"
              , conditions =
-                [ isInLocation "Marsh"
+                [ currentLocationIs "Marsh"
                 , itemIsInInventory "GreenMarble"
                 ]
              , changes = [ loadScene "bringMarbleHome" ]
              , narration = [ showHarryOneMarble ]
              }
            )
-        :: ( "rain in marsh"
+        :: ( "starts raining"
            , { interaction = withLocation "Marsh"
              , conditions =
-                [ itemIsNotPresent "Rain" ]
-                -- TODO, needs location fix
+                [ itemIsNotInLocation "Rain" "Marsh" ]
              , changes =
                 [ moveTo "Marsh"
-                , moveItem "Rain" "Marsh"
+                , moveItemToLocation "Rain" "Marsh"
                 ]
              , narration = [ "It's starting to rain!" ]
+             }
+           )
+        :: ( "in rain with umbrella"
+           , { interaction = withLocation "Marsh"
+             , conditions =
+                [ itemIsInLocation "Rain" "Marsh"
+                , itemIsInInventory "Umbrella"
+                ]
+             , changes = [ moveTo "Marsh" ]
+             , narration = [ "Still raining.  Good thing I brought my brolly!" ]
+             }
+           )
+        :: ( "in rain without umbrella"
+           , { interaction = withLocation "Marsh"
+             , conditions =
+                [ itemIsInLocation "Rain" "Marsh"
+                , itemIsNotInInventory "Umbrella"
+                ]
+             , changes = [ moveTo "Marsh" ]
+             , narration = [ "I'm getting all wet!  How miserable.  Foolish of me to leave my brolly at home on a day like this!" ]
              }
            )
         :: ( "reveal red marble"
            , { interaction = withItem "Umbrella"
              , conditions =
-                [ isInLocation "Marsh"
-                , itemIsPresent "Rain"
+                [ currentLocationIs "Marsh"
+                , itemIsInLocation "Rain" "Marsh"
                 , itemIsNotInInventory "RedMarble"
-                , itemIsNotPresent "SomethingRedAndShiny"
+                , itemIsNotInLocation "SomethingRedAndShiny" "Marsh"
                 ]
-             , changes = [ moveItem "SomethingRedAndShiny" "Marsh" ]
+             , changes = [ moveItemToLocation "SomethingRedAndShiny" "Marsh" ]
              , narration = [ revealRedMarble ]
              }
            )
@@ -147,7 +166,7 @@ searchForMarbles =
         :: ( "reveal green marble"
            , { interaction = withItem "VegatableGarden"
              , conditions = [ itemIsNotInInventory "GreenMarble" ]
-             , changes = [ moveItem "SomethingGreenAndShiny" "Garden" ]
+             , changes = [ moveItemToLocation "SomethingGreenAndShiny" "Garden" ]
              , narration = [ revealGreenMarble ]
              }
            )
@@ -179,7 +198,7 @@ bringMarbleHome =
              , conditions = [ itemIsInInventory "RedMarble" ]
              , changes =
                 [ moveTo "Home"
-                , moveItem "RedMarble" "Home"
+                , moveItemToLocation "RedMarble" "Home"
                 ]
              , narration =
                 [ "This will be safe here." ]
@@ -190,14 +209,14 @@ bringMarbleHome =
              , conditions = [ itemIsInInventory "GreenMarble" ]
              , changes =
                 [ moveTo "Home"
-                , moveItem "GreenMarble" "Home"
+                , moveItemToLocation "GreenMarble" "Home"
                 ]
              , narration = [ "This will be safe here." ]
              }
            )
         :: ( "lonely ending"
            , { interaction = withAnything
-             , conditions = [ isInLocation "Home" ]
+             , conditions = [ currentLocationIs "Home" ]
              , changes = [ endStory "Ending 1 of 2: All's well that ends well, though a bit lonely." ]
              , narration =
                 [ "Well, that's quite enough adventuring for today.  I think I'll just put on some tea and wait for Harry to come around."
@@ -215,7 +234,7 @@ bringMarbleHome =
            )
         :: ( "focus on getting home"
            , { interaction = withAnyItem
-             , conditions = [ isNotInLocation "Home" ]
+             , conditions = [ currentLocationIsNot "Home" ]
              , changes = []
              , narration =
                 [ "Harry wants me to bring his marble safely home.  I wouldn't mind a nice cup of tea besides." ]
@@ -223,7 +242,7 @@ bringMarbleHome =
            )
         :: ( "go where harry said"
            , { interaction = withAnyLocation
-             , conditions = [ isNotInLocation "Home" ]
+             , conditions = [ currentLocationIsNot "Home" ]
              , changes = []
              , narration =
                 [ "I really think I should just do as Harry asked." ]
@@ -245,10 +264,10 @@ goToPub =
     []
         ++ ( "go to pub with Harry"
            , { interaction = withLocation "Pub"
-             , conditions = [ isNotInLocation "Pub" ]
+             , conditions = [ currentLocationIsNot "Pub" ]
              , changes =
                 [ moveTo "Pub"
-                , moveCharacter "Harry" "Pub"
+                , moveCharacterToLocation "Harry" "Pub"
                 ]
              , narration = []
              }
@@ -263,14 +282,14 @@ goToPub =
         :: ( "z focus on going to pub"
              -- TODO this is needed until rules are weighted (or it matches instead of "go to pub with Harry")
            , { interaction = withAnything
-             , conditions = [ isNotInLocation "Pub" ]
+             , conditions = [ currentLocationIsNot "Pub" ]
              , changes = []
              , narration = [ "Right now I just really want a pint!" ]
              }
            )
         :: ( "good ending"
            , { interaction = withAnything
-             , conditions = [ isInLocation "Pub" ]
+             , conditions = [ currentLocationIs "Pub" ]
              , changes = [ endStory "Ending 2 of 2: No better way to end an adventure, than with a pint in the pub with a good friend!" ]
              , narration =
                 [ "Another daring adventure, finished."
@@ -286,8 +305,11 @@ harryGivesNote : String
 harryGivesNote =
     """
 Ah, my dear colleague Harry.
+
 "Alright Harry?  What are you getting up to today?"
+
 What's this?  He's given me a note.  And now he's run off.
+
 How peculiar.
 """
 
@@ -303,17 +325,22 @@ noteFromHarry =
 harryAsksForHelp : String
 harryAsksForHelp =
     """"Bartholomew, my friend!  Thanks for coming."
+
 "What is it Harry?  Why have you brought me here?"
+
 "I didn't want to say this earlier, but..."
+
 "Yes?"
+
 "I seem to have lost my marbles.  I've been all over looking for them."
+
+"Will you help me find them?"
 """
 
 
 talkWithHarry : List String
 talkWithHarry =
-    [ "\"Will you help me find them?\""
-    , "\"I'm still missing a red and a green one.\""
+    [ "\"I'm still missing a red and a green one.\""
     , "Poor Harry.  Not the sharpest tool in the shed.  But a good mate, always ready for a pint."
     , "\"Have you found one yet?\""
     ]
@@ -323,7 +350,10 @@ showHarryOneMarble : String
 showHarryOneMarble =
     """
 "Harry, I've found one!"
-"Let's see.  Well done Bartholomew!  That's lovely.  Only one more left.  Bring it to your house to keep it safe.  I'll pop by later to pick it up."
+
+"Let's see...  Ah yes, well done Bartholomew!  That's lovely.  But there's still one more left.
+
+Bring this to your house to keep it safe, and I'll keep looking for the other one.  I'll pop by later to pick it up."
 """
 
 
@@ -331,7 +361,9 @@ showHarryBothMarbles : String
 showHarryBothMarbles =
     """
 "Harry, look what I've found!"
-"Let's see.  My red marble.  And my green one too!  Well done Bartholomew, you found both of them.  That's just smashing!  Job done, want to nip to the pub for a pint?"
+
+"Let's see...  My red marble.  And my green one too!  Well done Bartholomew, you found both of them, smashing!  Job done, let's nip off to the pub for a pint."
+
 "Right, off to the pub!"
 """
 
@@ -339,6 +371,7 @@ showHarryBothMarbles =
 revealRedMarble : String
 revealRedMarble =
     """Good thing I brought my brolly.
+
 Hey... there's something shiny down there in the moss.  What is it?
 """
 
@@ -353,6 +386,7 @@ redMarble =
 revealGreenMarble : String
 revealGreenMarble =
     """Looking for Harry's marbles is a bore, maybe I'll just do a bit of gardening.
+
 Hold on... what's this?
 """
 

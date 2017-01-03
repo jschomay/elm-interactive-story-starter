@@ -30,15 +30,27 @@ view engineModel =
         inventory =
             Engine.getItemsInInventory engineModel
 
+        ending =
+            Engine.getTheEnd engineModel
+
         story =
             Engine.getStoryLine engineModel
+                ++ ( ""
+                   , Nothing
+                   , Just
+                        { name = "Begining"
+                        , description = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
+                        }
+                   , Nothing
+                   )
+                :: []
     in
         div [ class <| "GamePage" ]
             [ div [ class <| "GamePage__background GamePage__background--" ++ (Tuple.first currentLocation) ] []
             , div [ class "Layout" ]
                 [ div [ class "Layout__Main" ]
                     [ Theme.CurrentSummary.view currentLocation props characters
-                    , Theme.Storyline.view story
+                    , Theme.Storyline.view story ending
                     ]
                 , div [ class "Layout__Sidebar" ]
                     [ Theme.Locations.view locations

@@ -186,6 +186,7 @@ img {
   border-bottom: 1px solid #aaa;
   padding: 50px 0;
   font-size: 140%;
+  line-height: 140%;
   margin: 40px 0 80px 0;
 }
 
@@ -197,6 +198,12 @@ img {
   text-transform: capitalize;
 }
 
+.Storyline__Item__Ending {
+  font-size: 0.7em;
+  font-weight: bold;
+  margin-top: 40px;
+  text-align: center;
+}
 
 .Storyline__Item__Rollback {
   opacity: 0.2;

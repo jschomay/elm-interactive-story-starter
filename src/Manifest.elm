@@ -24,6 +24,6 @@ locations : List ( String, { name : String, description : String } )
 locations =
     [ ( "Home", { name = "Home", description = "Home sweet home.  There's nowhere I'd rather be.  Unless I'm out having an adventure." } )
     , ( "Garden", { name = "Garden", description = "The garden is lovely.  The marigolds are in full bloom.  I really do need to tend to the vegetable patch though." } )
-    , ( "Marsh", { name = "Marsh", description = "I wouldn't want to be caught here without my brolly!  Looks like it could rain any moment." } )
+    , ( "Marsh", { name = "Marsh", description = "Ugh, the ground is quite damp and squishy.  What in the blazes is Harry doing out here?" } )
     , ( "Pub", { name = "Pub", description = "As Samuel Johnson said, \"There is nothing which has yet been contrived by man, by which so much happiness is produced as by a good tavern or inn.\"" } )
     ]

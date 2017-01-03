@@ -45,12 +45,12 @@ init =
                 , characters = characters
                 }
                 scenes
-                [ moveItemToInventory "Umbrella"
-                , moveItem "VegatableGarden" "Garden"
+                [ moveItemToLocation "Umbrella" "Home"
+                , moveItemToLocation "VegatableGarden" "Garden"
                 , addLocation "Home"
                 , addLocation "Garden"
-                , moveCharacter "Harry" "Garden"
-                , moveItem "Pint" "Pub"
+                , moveCharacterToLocation "Harry" "Garden"
+                , moveItemToLocation "Pint" "Pub"
                 , moveTo "Home"
                 , loadScene "learnOfMystery"
                 ]
