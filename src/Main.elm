@@ -46,7 +46,7 @@ init =
                 }
                 scenes
                 [ moveItemToLocation "Umbrella" "Home"
-                , moveItemToLocation "VegatableGarden" "Garden"
+                , moveItemToLocationFixed "VegatableGarden" "Garden"
                 , addLocation "Home"
                 , addLocation "Garden"
                 , moveCharacterToLocation "Harry" "Garden"

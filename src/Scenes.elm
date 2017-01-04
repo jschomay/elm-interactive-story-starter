@@ -109,7 +109,7 @@ searchForMarbles =
                 [ itemIsNotInLocation "Rain" "Marsh" ]
              , changes =
                 [ moveTo "Marsh"
-                , moveItemToLocation "Rain" "Marsh"
+                , moveItemToLocationFixed "Rain" "Marsh"
                 ]
              , narration = [ "It's starting to rain!" ]
              }
