@@ -1,9 +1,10 @@
 module Scenes exposing (scenes)
 
 import Engine exposing (..)
+import ClientTypes exposing (..)
 
 
-scenes : List ( String, List ( String, Engine.Rule ) )
+scenes : List ( Id, List ( Id, Engine.Rule, Narration ) )
 scenes =
     [ ( "learnOfMystery", learnOfMystery )
     , ( "searchForMarbles", searchForMarbles )
@@ -13,7 +14,7 @@ scenes =
     ]
 
 
-learnOfMystery : List ( String, Engine.Rule )
+learnOfMystery : List ( Id, Engine.Rule, Narration )
 learnOfMystery =
     []
         ++ ( "get note from harry"
@@ -23,15 +24,15 @@ learnOfMystery =
                 [ moveCharacterToLocation "Harry" "Marsh"
                 , moveItemToInventory "NoteFromHarry"
                 ]
-             , narration = [ harryGivesNote ]
              }
+           , [ harryGivesNote ]
            )
         :: ( "read harry's note"
            , { interaction = withItem "NoteFromHarry"
              , conditions = []
              , changes = [ addLocation "Marsh" ]
-             , narration = noteFromHarry
              }
+           , noteFromHarry
            )
         :: ( "go to marsh"
            , { interaction = withLocation "Marsh"
@@ -40,20 +41,20 @@ learnOfMystery =
                 [ moveTo "Marsh"
                 , moveItemOffScreen "NoteFromHarry"
                 ]
-             , narration = []
              }
+           , []
            )
         :: ( "harry asks for help"
            , { interaction = withCharacter "Harry"
              , conditions = [ currentLocationIs "Marsh" ]
              , changes = [ loadScene "searchForMarbles" ]
-             , narration = [ harryAsksForHelp ]
              }
+           , [ harryAsksForHelp ]
            )
         :: []
 
 
-searchForMarbles : List ( String, Engine.Rule )
+searchForMarbles : List ( Id, Engine.Rule, Narration )
 searchForMarbles =
     []
         ++ ( "more about marbles"
@@ -64,8 +65,8 @@ searchForMarbles =
                 , itemIsNotInInventory "GreenMarble"
                 ]
              , changes = []
-             , narration = talkWithHarry
              }
+           , talkWithHarry
            )
         :: ( "show both marbles"
            , { interaction = withCharacter "Harry"
@@ -80,8 +81,8 @@ searchForMarbles =
                 , moveItemOffScreen "GreenMarble"
                 , moveItemOffScreen "RedMarble"
                 ]
-             , narration = [ showHarryBothMarbles ]
              }
+           , [ showHarryBothMarbles ]
            )
         :: ( "show red marble"
            , { interaction = withCharacter "Harry"
@@ -90,8 +91,8 @@ searchForMarbles =
                 , itemIsInInventory "RedMarble"
                 ]
              , changes = [ loadScene "bringMarbleHome" ]
-             , narration = [ showHarryOneMarble ]
              }
+           , [ showHarryOneMarble ]
            )
         :: ( "show green marble"
            , { interaction = withCharacter "Harry"
@@ -100,8 +101,8 @@ searchForMarbles =
                 , itemIsInInventory "GreenMarble"
                 ]
              , changes = [ loadScene "bringMarbleHome" ]
-             , narration = [ showHarryOneMarble ]
              }
+           , [ showHarryOneMarble ]
            )
         :: ( "starts raining"
            , { interaction = withLocation "Marsh"
@@ -111,8 +112,8 @@ searchForMarbles =
                 [ moveTo "Marsh"
                 , moveItemToLocationFixed "Rain" "Marsh"
                 ]
-             , narration = [ "It's starting to rain!" ]
              }
+           , [ "It's starting to rain!" ]
            )
         :: ( "in rain with umbrella"
            , { interaction = withLocation "Marsh"
@@ -121,8 +122,8 @@ searchForMarbles =
                 , itemIsInInventory "Umbrella"
                 ]
              , changes = [ moveTo "Marsh" ]
-             , narration = [ "Still raining.  Good thing I brought my brolly!" ]
              }
+           , [ "Still raining.  Good thing I brought my brolly!" ]
            )
         :: ( "in rain without umbrella"
            , { interaction = withLocation "Marsh"
@@ -131,8 +132,8 @@ searchForMarbles =
                 , itemIsNotInInventory "Umbrella"
                 ]
              , changes = [ moveTo "Marsh" ]
-             , narration = [ "I'm getting all wet!  How miserable.  Foolish of me to leave my brolly at home on a day like this!" ]
              }
+           , [ "I'm getting all wet!  How miserable.  Foolish of me to leave my brolly at home on a day like this!" ]
            )
         :: ( "reveal red marble"
            , { interaction = withItem "Umbrella"
@@ -143,8 +144,8 @@ searchForMarbles =
                 , itemIsNotInLocation "SomethingRedAndShiny" "Marsh"
                 ]
              , changes = [ moveItemToLocation "SomethingRedAndShiny" "Marsh" ]
-             , narration = [ revealRedMarble ]
              }
+           , [ revealRedMarble ]
            )
         :: ( "find red marble"
            , { interaction = withItem "SomethingRedAndShiny"
@@ -153,22 +154,22 @@ searchForMarbles =
                 [ moveItemToInventory "RedMarble"
                 , moveItemOffScreen "SomethingRedAndShiny"
                 ]
-             , narration = [ "Hey, it's Harry's red marble!" ]
              }
+           , [ "Hey, it's Harry's red marble!" ]
            )
         :: ( "red marble description"
            , { interaction = withItem "RedMarble"
              , conditions = []
              , changes = []
-             , narration = redMarble
              }
+           , redMarble
            )
         :: ( "reveal green marble"
            , { interaction = withItem "VegatableGarden"
              , conditions = [ itemIsNotInInventory "GreenMarble" ]
              , changes = [ moveItemToLocation "SomethingGreenAndShiny" "Garden" ]
-             , narration = [ revealGreenMarble ]
              }
+           , [ revealGreenMarble ]
            )
         :: ( "find green marble"
            , { interaction = withItem "SomethingGreenAndShiny"
@@ -177,20 +178,20 @@ searchForMarbles =
                 [ moveItemToInventory "GreenMarble"
                 , moveItemOffScreen "SomethingGreenAndShiny"
                 ]
-             , narration = [ "It's Harry's green marble!  How did that get there?" ]
              }
+           , [ "It's Harry's green marble!  How did that get there?" ]
            )
         :: ( "green marble description"
            , { interaction = withItem "GreenMarble"
              , conditions = []
              , changes = []
-             , narration = greenMarble
              }
+           , greenMarble
            )
         :: []
 
 
-bringMarbleHome : List ( String, Engine.Rule )
+bringMarbleHome : List ( Id, Engine.Rule, Narration )
 bringMarbleHome =
     []
         ++ ( "bring red marble home"
@@ -200,9 +201,8 @@ bringMarbleHome =
                 [ moveTo "Home"
                 , moveItemToLocation "RedMarble" "Home"
                 ]
-             , narration =
-                [ "This will be safe here." ]
              }
+           , [ "This will be safe here." ]
            )
         :: ( "bring green marble home"
            , { interaction = withLocation "Home"
@@ -211,55 +211,51 @@ bringMarbleHome =
                 [ moveTo "Home"
                 , moveItemToLocation "GreenMarble" "Home"
                 ]
-             , narration = [ "This will be safe here." ]
              }
+           , [ "This will be safe here." ]
            )
         :: ( "lonely ending"
            , { interaction = withAnything
              , conditions = [ currentLocationIs "Home" ]
              , changes = [ endStory "Ending 1 of 2: All's well that ends well, though a bit lonely." ]
-             , narration =
-                [ "Well, that's quite enough adventuring for today.  I think I'll just put on some tea and wait for Harry to come around."
-                , "Ah yes, lovely tea."
-                , "Harry hasn't show up yet.  I wonder if he'll find his other marble."
-                , "Might do another cup of tea."
-                , "I don't think Harry's coming."
-                , "I really do think the adventure is over now."
-                , "The end."
-                , "Or is it?"
-                , "Yes, it really is.  The end."
-                , "The end."
-                ]
              }
+           , [ "Well, that's quite enough adventuring for today.  I think I'll just put on some tea and wait for Harry to come around."
+             , "Ah yes, lovely tea."
+             , "Harry hasn't show up yet.  I wonder if he'll find his other marble."
+             , "Might do another cup of tea."
+             , "I don't think Harry's coming."
+             , "I really do think the adventure is over now."
+             , "The end."
+             , "Or is it?"
+             , "Yes, it really is.  The end."
+             , "The end."
+             ]
            )
         :: ( "focus on getting home"
            , { interaction = withAnyItem
              , conditions = [ currentLocationIsNot "Home" ]
              , changes = []
-             , narration =
-                [ "Harry wants me to bring his marble safely home.  I wouldn't mind a nice cup of tea besides." ]
              }
+           , [ "Harry wants me to bring his marble safely home.  I wouldn't mind a nice cup of tea besides." ]
            )
         :: ( "go where harry said"
            , { interaction = withAnyLocation
              , conditions = [ currentLocationIsNot "Home" ]
              , changes = []
-             , narration =
-                [ "I really think I should just do as Harry asked." ]
              }
+           , [ "I really think I should just do as Harry asked." ]
            )
         :: ( "no more to say"
            , { interaction = withCharacter "Harry"
              , conditions = []
              , changes = []
-             , narration =
-                [ "\"Go on now Bartholomew, keep that safe for me.\"" ]
              }
+           , [ "\"Go on now Bartholomew, keep that safe for me.\"" ]
            )
         :: []
 
 
-goToPub : List ( String, Engine.Rule )
+goToPub : List ( Id, Engine.Rule, Narration )
 goToPub =
     []
         ++ ( "go to pub with Harry"
@@ -269,34 +265,33 @@ goToPub =
                 [ moveTo "Pub"
                 , moveCharacterToLocation "Harry" "Pub"
                 ]
-             , narration = []
              }
+           , []
            )
         :: ( "cheers"
            , { interaction = withItem "Pint"
              , conditions = []
              , changes = []
-             , narration = [ "Cheers Harry!  To the next adventure." ]
              }
+           , [ "Cheers Harry!  To the next adventure." ]
            )
         :: ( "z focus on going to pub"
              -- TODO this is needed until rules are weighted (or it matches instead of "go to pub with Harry")
            , { interaction = withAnything
              , conditions = [ currentLocationIsNot "Pub" ]
              , changes = []
-             , narration = [ "Right now I just really want a pint!" ]
              }
+           , [ "Right now I just really want a pint!" ]
            )
         :: ( "good ending"
            , { interaction = withAnything
              , conditions = [ currentLocationIs "Pub" ]
              , changes = [ endStory "Ending 2 of 2: No better way to end an adventure, than with a pint in the pub with a good friend!" ]
-             , narration =
-                [ "Another daring adventure, finished."
-                , "There's nothing more to do, not until the next adventure."
-                , "The end."
-                ]
              }
+           , [ "Another daring adventure, finished."
+             , "There's nothing more to do, not until the next adventure."
+             , "The end."
+             ]
            )
         :: []
 

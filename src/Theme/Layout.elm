@@ -6,49 +6,41 @@ import Theme.CurrentSummary exposing (..)
 import Theme.Storyline exposing (..)
 import Theme.Locations exposing (..)
 import Theme.Inventory exposing (..)
-import Types exposing (..)
-import Engine
+import ClientTypes exposing (..)
 
 
 view :
-    { currentLocation : Maybe ( String, Attributes )
-    , itemsInCurrentLocation : List ( String, Attributes )
-    , charactersInCurrentLocation : List ( String, Attributes )
-    , locations : List ( String, Attributes )
-    , itemsInInventory : List ( String, Attributes )
+    { currentLocation : ( Id, Attributes )
+    , itemsInCurrentLocation : List ( Id, Attributes )
+    , charactersInCurrentLocation : List ( Id, Attributes )
+    , locations : List ( Id, Attributes )
+    , itemsInInventory : List ( Id, Attributes )
     , ending : Maybe String
-    , storyLine : List ( String, Maybe String, Maybe Attributes, Maybe String )
+    , storyLine : List StorySnippet
     }
-    -> Html Engine.Msg
+    -> Html Msg
 view displayState =
     div [ class <| "GamePage" ]
         [ div
             [ class <|
                 "GamePage__background GamePage__background--"
-                    ++ (Tuple.first <| Maybe.withDefault ( "none", { name = "", description = "" } ) displayState.currentLocation)
+                    ++ (Tuple.second displayState.currentLocation |> .cssSelector)
             ]
             []
         , div [ class "Layout" ]
             [ div [ class "Layout__Main" ] <|
-                (case displayState.currentLocation of
-                    Nothing ->
-                        []
-
-                    Just currentLocation ->
-                        [ Theme.CurrentSummary.view
-                            currentLocation
-                            displayState.itemsInCurrentLocation
-                            displayState.charactersInCurrentLocation
-                        ]
-                )
-                    ++ [ Theme.Storyline.view
-                            displayState.storyLine
-                            displayState.ending
-                       ]
+                [ Theme.CurrentSummary.view
+                    displayState.currentLocation
+                    displayState.itemsInCurrentLocation
+                    displayState.charactersInCurrentLocation
+                , Theme.Storyline.view
+                    displayState.storyLine
+                    displayState.ending
+                ]
             , div [ class "Layout__Sidebar" ]
                 [ Theme.Locations.view
                     displayState.locations
-                    (Maybe.withDefault "none" <| Maybe.map Tuple.first displayState.currentLocation)
+                    (Tuple.first displayState.currentLocation)
                 , Theme.Inventory.view
                     displayState.itemsInInventory
                 ]

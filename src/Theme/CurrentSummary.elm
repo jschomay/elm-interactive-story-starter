@@ -3,23 +3,23 @@ module Theme.CurrentSummary exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Engine
+import ClientTypes exposing (..)
 
 
 view :
     ( String, { a | name : String } )
     -> List ( String, { a | name : String } )
     -> List ( String, { a | name : String } )
-    -> Html Engine.Msg
+    -> Html Msg
 view ( _, currentLocationAttrs ) props characters =
     let
         isEmpty =
             List.isEmpty characters && List.isEmpty props
 
-        interactableView msg ( interactable, attrs ) =
+        interactableView msg ( interactableId, attrs ) =
             span
                 [ class "CurrentSummary__StoryElement u-selectable"
-                , onClick <| msg interactable
+                , onClick <| msg interactableId
                 ]
                 [ text <| .name attrs ]
 
@@ -40,7 +40,7 @@ view ( _, currentLocationAttrs ) props characters =
         charactersList =
             if not <| List.isEmpty characters then
                 characters
-                    |> List.map (interactableView Engine.interactMsg)
+                    |> List.map (interactableView Interact)
                     |> format
                     |> (::) (text "Characters here: ")
                     |> p []
@@ -50,7 +50,7 @@ view ( _, currentLocationAttrs ) props characters =
         propsList =
             if not <| List.isEmpty props then
                 props
-                    |> List.map (interactableView Engine.interactMsg)
+                    |> List.map (interactableView Interact)
                     |> format
                     |> (::) (text "Items here: ")
                     |> p []

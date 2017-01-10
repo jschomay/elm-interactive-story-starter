@@ -4,34 +4,34 @@ import Html exposing (..)
 import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Engine
+import ClientTypes exposing (..)
 
 
 view :
-    List ( String, { name : String, description : String } )
+    List ( String, Attributes )
     -> String
-    -> Html Engine.Msg
+    -> Html Msg
 view locations currentLocation =
     let
-        classes location =
+        classes locationId =
             classList
                 [ ( "Locations__Location", True )
-                , ( "Locations__Location--current", location == currentLocation )
+                , ( "Locations__Location--current", locationId == currentLocation )
                 , ( "u-selectable", True )
                 ]
 
         numLocations =
             List.length locations
 
-        locationItem i ( location, { name, description } ) =
+        locationItem i ( locationId, { name, description } ) =
             let
                 key =
-                    (toString location) ++ (toString <| numLocations - i)
+                    (toString locationId) ++ (toString <| numLocations - i)
             in
                 ( key
                 , li
-                    ([ classes location
-                     , onClick <| Engine.interactMsg location
+                    ([ classes locationId
+                     , onClick <| Interact locationId
                      ]
                     )
                     [ text <| name ]

@@ -4,26 +4,26 @@ import Html exposing (..)
 import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Engine
+import ClientTypes exposing (..)
 
 
 view :
-    List ( String, { a | name : String } )
-    -> Html Engine.Msg
+    List ( String, Attributes )
+    -> Html Msg
 view items =
     let
         numItems =
             List.length items
 
-        inventoryItem i ( item, attrs ) =
+        inventoryItem i ( itemId, attrs ) =
             let
                 key =
-                    (toString item) ++ (toString <| numItems - i)
+                    (toString itemId) ++ (toString <| numItems - i)
             in
                 ( key
                 , li
                     [ class "Inventory__Item u-selectable"
-                    , onClick <| Engine.interactMsg item
+                    , onClick <| Interact itemId
                     ]
                     [ text <| .name <| attrs ]
                 )
