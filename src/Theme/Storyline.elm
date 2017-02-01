@@ -17,7 +17,7 @@ view :
     -> Html Msg
 view storyLine ending =
     let
-        storyLi i { interactableName, interactableCssSelector, narration } =
+        storyLi i { interactableName, interactableCssSelector, narrative } =
             let
                 numLines =
                     List.length storyLine
@@ -34,7 +34,7 @@ view storyLine ending =
                 ( key
                 , li [ classList classes ] <|
                     [ h4 [ class "Storyline__Item__Action" ] <| [ text interactableName ]
-                    , Markdown.toHtml [ class "Storyline__Item__Narration markdown-body" ] narration
+                    , Markdown.toHtml [ class "Storyline__Item__Narrative markdown-body" ] narrative
                     ]
                         ++ if i == 0 && ending /= Nothing then
                             [ h5

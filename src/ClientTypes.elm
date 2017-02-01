@@ -16,6 +16,13 @@ type alias Id =
     String
 
 
+type alias RuleData a =
+    { a
+        | summary : String
+        , narrative : Narrative
+    }
+
+
 type alias Attributes =
     { name : String
     , description : String
@@ -23,12 +30,12 @@ type alias Attributes =
     }
 
 
-type alias Narration =
+type alias Narrative =
     List String
 
 
 type alias StorySnippet =
     { interactableName : String
     , interactableCssSelector : String
-    , narration : String
+    , narrative : String
     }

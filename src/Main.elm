@@ -2,7 +2,7 @@ port module Main exposing (..)
 
 import Engine exposing (..)
 import Manifest exposing (..)
-import Scenes exposing (..)
+import Rules exposing (rulesData)
 import Html exposing (..)
 import Theme.TitlePage
 import Theme.Layout
@@ -33,12 +33,41 @@ stripAttributes =
     List.map Tuple.first
 
 
-stripNarration : List ( Id, List ( Id, Rule, Narration ) ) -> List ( Id, List ( Id, Rule ) )
-stripNarration =
-    List.map <|
-        Tuple.mapSecond <|
-            List.map <|
-                \( id, rule, _ ) -> ( id, rule )
+pluckRules : Engine.Rules
+pluckRules =
+    let
+        foldFn :
+            RuleData Engine.Rule
+            -> ( Int, Dict String Engine.Rule )
+            -> ( Int, Dict String Engine.Rule )
+        foldFn { interaction, conditions, changes } ( id, rules ) =
+            ( id + 1
+            , Dict.insert ((++) "rule" <| toString <| id + 1)
+                { interaction = interaction
+                , conditions = conditions
+                , changes = changes
+                }
+                rules
+            )
+    in
+        Tuple.second <| List.foldl foldFn ( 1, Dict.empty ) rulesData
+
+
+pluckContent : Dict String Narrative
+pluckContent =
+    let
+        foldFn :
+            RuleData Engine.Rule
+            -> ( Int, Dict String Narrative )
+            -> ( Int, Dict String Narrative )
+        foldFn { narrative } ( id, narratives ) =
+            ( id + 1
+            , Dict.insert ((++) "rule" <| toString <| id + 1)
+                narrative
+                narratives
+            )
+    in
+        Tuple.second <| List.foldl foldFn ( 1, Dict.empty ) rulesData
 
 
 init : ( Model, Cmd ClientTypes.Msg )
@@ -50,7 +79,7 @@ init =
                     , locations = stripAttributes locations
                     , characters = stripAttributes characters
                     }
-                , scenes = (stripNarration scenes)
+                , rules = (pluckRules)
                 , startingScene = "learnOfMystery"
                 , startingLocation = "Home"
                 , setup =
@@ -67,7 +96,7 @@ init =
       , storyLine =
             [ { interactableName = "Begin"
               , interactableCssSelector = ""
-              , narration = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
+              , narrative = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
               }
             ]
       }
@@ -86,17 +115,17 @@ update msg model =
                 ( newEngineModel, maybeMatchedRuleId ) =
                     Engine.update interactableId model.engineModel
 
-                narration =
+                narrative =
                     { interactableName = getAttributes interactableId |> .name
                     , interactableCssSelector = getAttributes interactableId |> .cssSelector
-                    , narration =
-                        getNarration maybeMatchedRuleId
+                    , narrative =
+                        getNarrative maybeMatchedRuleId
                             |> Maybe.withDefault (getAttributes interactableId |> .description)
                     }
             in
                 ( { model
                     | engineModel = newEngineModel
-                    , storyLine = narration :: model.storyLine
+                    , storyLine = narrative :: model.storyLine
                   }
                 , Cmd.none
                 )
@@ -120,20 +149,10 @@ subscriptions model =
     loaded <| always Loaded
 
 
-content : Dict String Narration
-content =
-    Dict.fromList <|
-        List.concatMap
-            (Tuple.second
-                >> (List.map (\( key, _, narration ) -> ( key, narration )))
-            )
-            scenes
-
-
-getNarration : Maybe String -> Maybe String
-getNarration ruleId =
+getNarrative : Maybe String -> Maybe String
+getNarrative ruleId =
     ruleId
-        |> Maybe.andThen (flip Dict.get content)
+        |> Maybe.andThen (flip Dict.get pluckContent)
         |> Maybe.andThen List.head
 
 
