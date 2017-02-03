@@ -289,8 +289,7 @@ rulesData =
            , narrative = [ "Cheers Harry!  To the next adventure." ]
            }
         :: { summary =
-                "z focus on going to pub"
-                -- TODO this is needed until rules are weighted (or it matches instead of "go to pub with Harry")
+                "focus on going to pub"
            , interaction = withAnything
            , conditions =
                 [ currentLocationIsNot "Pub"
