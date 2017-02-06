@@ -167,13 +167,13 @@ getNarrative content ruleId =
 
 
 updateContent : Maybe (Maybe (Zipper String)) -> Maybe (Maybe (Zipper String))
-updateContent content =
-    case content of
-        Just (Just narration) ->
-            Just <| Just <| Maybe.withDefault narration (Zipper.next narration)
-
-        _ ->
-            Nothing
+updateContent =
+    let
+        nextOrStay narration =
+            Zipper.next narration
+                |> Maybe.withDefault narration
+    in
+        (Maybe.map >> Maybe.map) nextOrStay
 
 
 getAttributes : Id -> Attributes
