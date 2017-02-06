@@ -8,6 +8,7 @@ import Theme.TitlePage
 import Theme.Layout
 import ClientTypes exposing (..)
 import Dict exposing (Dict)
+import List.Zipper as Zipper exposing (Zipper)
 
 
 type alias Model =
@@ -15,6 +16,7 @@ type alias Model =
     , route : Route
     , loaded : Bool
     , storyLine : List StorySnippet
+    , content : Dict String (Maybe (Zipper String))
     }
 
 
@@ -53,17 +55,17 @@ pluckRules =
         Tuple.second <| List.foldl foldFn ( 1, Dict.empty ) rulesData
 
 
-pluckContent : Dict String Narrative
+pluckContent : Dict String (Maybe (Zipper String))
 pluckContent =
     let
         foldFn :
             RuleData Engine.Rule
-            -> ( Int, Dict String Narrative )
-            -> ( Int, Dict String Narrative )
+            -> ( Int, Dict String (Maybe (Zipper String)) )
+            -> ( Int, Dict String (Maybe (Zipper String)) )
         foldFn { narrative } ( id, narratives ) =
             ( id + 1
             , Dict.insert ((++) "rule" <| toString <| id + 1)
-                narrative
+                (Zipper.fromList narrative)
                 narratives
             )
     in
@@ -99,6 +101,7 @@ init =
               , narrative = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
               }
             ]
+      , content = pluckContent
       }
     , Cmd.none
     )
@@ -119,13 +122,19 @@ update msg model =
                     { interactableName = getAttributes interactableId |> .name
                     , interactableCssSelector = getAttributes interactableId |> .cssSelector
                     , narrative =
-                        getNarrative maybeMatchedRuleId
+                        getNarrative model.content maybeMatchedRuleId
                             |> Maybe.withDefault (getAttributes interactableId |> .description)
                     }
+
+                updatedContent =
+                    maybeMatchedRuleId
+                        |> Maybe.map (\id -> Dict.update id updateContent model.content)
+                        |> Maybe.withDefault model.content
             in
                 ( { model
                     | engineModel = newEngineModel
                     , storyLine = narrative :: model.storyLine
+                    , content = updatedContent
                   }
                 , Cmd.none
                 )
@@ -149,11 +158,22 @@ subscriptions model =
     loaded <| always Loaded
 
 
-getNarrative : Maybe String -> Maybe String
-getNarrative ruleId =
+getNarrative : Dict String (Maybe (Zipper String)) -> Maybe String -> Maybe String
+getNarrative content ruleId =
     ruleId
-        |> Maybe.andThen (flip Dict.get pluckContent)
-        |> Maybe.andThen List.head
+        |> Maybe.andThen (\id -> Dict.get id content)
+        |> Maybe.andThen identity
+        |> Maybe.map Zipper.current
+
+
+updateContent : Maybe (Maybe (Zipper String)) -> Maybe (Maybe (Zipper String))
+updateContent content =
+    case content of
+        Just (Just narration) ->
+            Just <| Just <| Maybe.withDefault narration (Zipper.next narration)
+
+        _ ->
+            Nothing
 
 
 getAttributes : Id -> Attributes
