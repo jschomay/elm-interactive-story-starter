@@ -7,14 +7,15 @@ import Theme.Storyline exposing (..)
 import Theme.Locations exposing (..)
 import Theme.Inventory exposing (..)
 import ClientTypes exposing (..)
+import Components exposing (..)
 
 
 view :
-    { currentLocation : ( Id, Attributes )
-    , itemsInCurrentLocation : List ( Id, Attributes )
-    , charactersInCurrentLocation : List ( Id, Attributes )
-    , locations : List ( Id, Attributes )
-    , itemsInInventory : List ( Id, Attributes )
+    { currentLocation : Entity
+    , itemsInCurrentLocation : List Entity
+    , charactersInCurrentLocation : List Entity
+    , locations : List Entity
+    , itemsInInventory : List Entity
     , ending : Maybe String
     , storyLine : List StorySnippet
     }
@@ -24,7 +25,7 @@ view displayState =
         [ div
             [ class <|
                 "GamePage__background GamePage__background--"
-                    ++ (Tuple.second displayState.currentLocation |> .cssSelector)
+                    ++ (Components.getStyle displayState.currentLocation)
             ]
             []
         , div [ class "Layout" ]
@@ -40,7 +41,7 @@ view displayState =
             , div [ class "Layout__Sidebar" ]
                 [ Theme.Locations.view
                     displayState.locations
-                    (Tuple.first displayState.currentLocation)
+                    displayState.currentLocation
                 , Theme.Inventory.view
                     displayState.itemsInInventory
                 ]

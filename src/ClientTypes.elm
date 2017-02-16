@@ -1,5 +1,7 @@
 module ClientTypes exposing (..)
 
+import Dict exposing (Dict)
+
 
 type Route
     = TitlePage
@@ -23,13 +25,6 @@ type alias RuleData a =
     }
 
 
-type alias Attributes =
-    { name : String
-    , description : String
-    , cssSelector : String
-    }
-
-
 type alias Narrative =
     List String
 
@@ -38,4 +33,19 @@ type alias StorySnippet =
     { interactableName : String
     , interactableCssSelector : String
     , narrative : String
+    }
+
+
+type alias Components =
+    Dict String Component
+
+
+type Component
+    = Display { name : String, description : String }
+    | Style String
+
+
+type alias Entity =
+    { id : String
+    , components : Components
     }

@@ -5,36 +5,37 @@ import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ClientTypes exposing (..)
+import Components exposing (..)
 
 
 view :
-    List ( String, Attributes )
-    -> String
+    List Entity
+    -> Entity
     -> Html Msg
 view locations currentLocation =
     let
         classes locationId =
             classList
                 [ ( "Locations__Location", True )
-                , ( "Locations__Location--current", locationId == currentLocation )
+                , ( "Locations__Location--current", locationId == currentLocation.id )
                 , ( "u-selectable", True )
                 ]
 
         numLocations =
             List.length locations
 
-        locationItem i ( locationId, { name, description } ) =
+        locationItem i entity =
             let
                 key =
-                    (toString locationId) ++ (toString <| numLocations - i)
+                    (toString entity.id) ++ (toString <| numLocations - i)
             in
                 ( key
                 , li
-                    ([ classes locationId
-                     , onClick <| Interact locationId
+                    ([ classes entity.id
+                     , onClick <| Interact entity.id
                      ]
                     )
-                    [ text <| name ]
+                    [ text <| .name <| getDisplay entity ]
                 )
     in
         div [ class "Locations" ]

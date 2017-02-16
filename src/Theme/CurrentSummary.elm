@@ -4,24 +4,25 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ClientTypes exposing (..)
+import Components exposing (..)
 
 
 view :
-    ( String, { a | name : String } )
-    -> List ( String, { a | name : String } )
-    -> List ( String, { a | name : String } )
+    Entity
+    -> List Entity
+    -> List Entity
     -> Html Msg
-view ( _, currentLocationAttrs ) props characters =
+view currentLocation props characters =
     let
         isEmpty =
             List.isEmpty characters && List.isEmpty props
 
-        interactableView msg ( interactableId, attrs ) =
+        interactableView msg entity =
             span
                 [ class "CurrentSummary__StoryElement u-selectable"
-                , onClick <| msg interactableId
+                , onClick <| msg entity.id
                 ]
-                [ text <| .name attrs ]
+                [ text <| .name <| getDisplay entity ]
 
         format list =
             let
@@ -59,7 +60,7 @@ view ( _, currentLocationAttrs ) props characters =
     in
         div [ class "CurrentSummary", style [] ] <|
             [ h1 [ class "Current-location" ]
-                [ text <| .name <| currentLocationAttrs ]
+                [ text <| .name <| getDisplay currentLocation ]
             ]
                 ++ if isEmpty then
                     [ text "Nothing here." ]

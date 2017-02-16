@@ -7,6 +7,7 @@ import Html exposing (..)
 import Theme.TitlePage
 import Theme.Layout
 import ClientTypes exposing (..)
+import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
 
@@ -30,9 +31,26 @@ main =
         }
 
 
-stripAttributes : List ( Id, Attributes ) -> List Id
-stripAttributes =
-    List.map Tuple.first
+getIds : List Entity -> List Id
+getIds =
+    List.map .id
+
+
+findEntity : Id -> Entity
+findEntity id =
+    let
+        interactables =
+            items ++ locations ++ characters
+
+        entity =
+            List.head <| List.filter (.id >> (==) id) interactables
+    in
+        case entity of
+            Just entity ->
+                entity
+
+            Nothing ->
+                Debug.crash <| "Couldn't find entity from id: " ++ id
 
 
 pluckRules : Engine.Rules
@@ -77,9 +95,9 @@ init =
     ( { engineModel =
             Engine.init
                 { manifest =
-                    { items = stripAttributes items
-                    , locations = stripAttributes locations
-                    , characters = stripAttributes characters
+                    { items = getIds items
+                    , locations = getIds locations
+                    , characters = getIds characters
                     }
                 , rules = (pluckRules)
                 , startingScene = "learnOfMystery"
@@ -119,11 +137,11 @@ update msg model =
                     Engine.update interactableId model.engineModel
 
                 narrative =
-                    { interactableName = getAttributes interactableId |> .name
-                    , interactableCssSelector = getAttributes interactableId |> .cssSelector
+                    { interactableName = findEntity interactableId |> getDisplay |> .name
+                    , interactableCssSelector = findEntity interactableId |> getStyle
                     , narrative =
                         getNarrative model.content maybeMatchedRuleId
-                            |> Maybe.withDefault (getAttributes interactableId |> .description)
+                            |> Maybe.withDefault (findEntity interactableId |> getDisplay |> .description)
                     }
 
                 updatedContent =
@@ -176,20 +194,6 @@ updateContent =
         (Maybe.map >> Maybe.map) nextOrStay
 
 
-getAttributes : Id -> Attributes
-getAttributes id =
-    let
-        interactables =
-            Dict.fromList (items ++ locations ++ characters)
-    in
-        case Dict.get id interactables of
-            Nothing ->
-                Debug.crash <| "Cannot find an interactable for id " ++ id
-
-            Just attrs ->
-                attrs
-
-
 view :
     Model
     -> Html ClientTypes.Msg
@@ -200,26 +204,22 @@ view model =
 
         GamePage ->
             let
-                idAndAttrs : Id -> ( Id, Attributes )
-                idAndAttrs id =
-                    ( id, getAttributes id )
-
                 displayState =
                     { currentLocation =
                         Engine.getCurrentLocation model.engineModel
-                            |> idAndAttrs
+                            |> findEntity
                     , itemsInCurrentLocation =
                         Engine.getItemsInCurrentLocation model.engineModel
-                            |> List.map idAndAttrs
+                            |> List.map findEntity
                     , charactersInCurrentLocation =
                         Engine.getCharactersInCurrentLocation model.engineModel
-                            |> List.map idAndAttrs
+                            |> List.map findEntity
                     , locations =
                         Engine.getLocations model.engineModel
-                            |> List.map idAndAttrs
+                            |> List.map findEntity
                     , itemsInInventory =
                         Engine.getItemsInInventory model.engineModel
-                            |> List.map idAndAttrs
+                            |> List.map findEntity
                     , ending =
                         Engine.getEnding model.engineModel
                     , storyLine =

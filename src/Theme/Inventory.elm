@@ -5,27 +5,28 @@ import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ClientTypes exposing (..)
+import Components exposing (..)
 
 
 view :
-    List ( String, Attributes )
+    List Entity
     -> Html Msg
 view items =
     let
         numItems =
             List.length items
 
-        inventoryItem i ( itemId, attrs ) =
+        inventoryItem i entity =
             let
                 key =
-                    (toString itemId) ++ (toString <| numItems - i)
+                    (toString entity.id) ++ (toString <| numItems - i)
             in
                 ( key
                 , li
                     [ class "Inventory__Item u-selectable"
-                    , onClick <| Interact itemId
+                    , onClick <| Interact entity.id
                     ]
-                    [ text <| .name <| attrs ]
+                    [ text <| .name <| getDisplay entity ]
                 )
     in
         div [ class "Inventory" ]
