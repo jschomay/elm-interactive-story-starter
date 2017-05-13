@@ -92,37 +92,38 @@ pluckContent =
 
 init : ( Model, Cmd ClientTypes.Msg )
 init =
-    ( { engineModel =
-            Engine.init
-                { manifest =
+    let
+        startingState =
+            [ loadScene "learnOfMystery"
+            , moveTo "Home"
+            , moveItemToLocation "Umbrella" "Home"
+            , moveItemToLocationFixed "VegatableGarden" "Garden"
+            , addLocation "Home"
+            , addLocation "Garden"
+            , moveCharacterToLocation "Harry" "Garden"
+            , moveItemToLocation "Pint" "Pub"
+            ]
+    in
+        ( { engineModel =
+                Engine.init
                     { items = getIds items
                     , locations = getIds locations
                     , characters = getIds characters
                     }
-                , rules = (pluckRules)
-                , startingScene = "learnOfMystery"
-                , startingLocation = "Home"
-                , setup =
-                    [ moveItemToLocation "Umbrella" "Home"
-                    , moveItemToLocationFixed "VegatableGarden" "Garden"
-                    , addLocation "Home"
-                    , addLocation "Garden"
-                    , moveCharacterToLocation "Harry" "Garden"
-                    , moveItemToLocation "Pint" "Pub"
-                    ]
-                }
-      , route = TitlePage
-      , loaded = False
-      , storyLine =
-            [ { interactableName = "Begin"
-              , interactableCssSelector = ""
-              , narrative = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
-              }
-            ]
-      , content = pluckContent
-      }
-    , Cmd.none
-    )
+                    pluckRules
+                    |> Engine.changeWorld startingState
+          , route = TitlePage
+          , loaded = False
+          , storyLine =
+                [ { interactableName = "Begin"
+                  , interactableCssSelector = ""
+                  , narrative = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
+                  }
+                ]
+          , content = pluckContent
+          }
+        , Cmd.none
+        )
 
 
 update :

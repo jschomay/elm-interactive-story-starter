@@ -10,7 +10,7 @@ rulesData =
         -- learnOfMystery
         ++
             { summary = "get note from harry"
-            , interaction = withCharacter "Harry"
+            , interaction = with "Harry"
             , conditions =
                 [ currentLocationIs "Garden"
                 , currentSceneIs "learnOfMystery"
@@ -22,7 +22,7 @@ rulesData =
             , narrative = [ harryGivesNote ]
             }
         :: { summary = "read harry's note"
-           , interaction = withItem "NoteFromHarry"
+           , interaction = with "NoteFromHarry"
            , conditions =
                 [ currentSceneIs "learnOfMystery"
                 ]
@@ -30,7 +30,7 @@ rulesData =
            , narrative = noteFromHarry
            }
         :: { summary = "go to marsh"
-           , interaction = withLocation "Marsh"
+           , interaction = with "Marsh"
            , conditions =
                 [ itemIsInInventory "NoteFromHarry"
                 , currentSceneIs "learnOfMystery"
@@ -42,7 +42,7 @@ rulesData =
            , narrative = []
            }
         :: { summary = "harry asks for help"
-           , interaction = withCharacter "Harry"
+           , interaction = with "Harry"
            , conditions =
                 [ currentLocationIs "Marsh"
                 , currentSceneIs "learnOfMystery"
@@ -53,7 +53,7 @@ rulesData =
         -- searchForMarbles
         ::
             { summary = "more about marbles"
-            , interaction = withCharacter "Harry"
+            , interaction = with "Harry"
             , conditions =
                 [ currentLocationIs "Marsh"
                 , itemIsNotInInventory "RedMarble"
@@ -64,7 +64,7 @@ rulesData =
             , narrative = talkWithHarry
             }
         :: { summary = "show both marbles"
-           , interaction = withCharacter "Harry"
+           , interaction = with "Harry"
            , conditions =
                 [ currentLocationIs "Marsh"
                 , itemIsInInventory "RedMarble"
@@ -80,7 +80,7 @@ rulesData =
            , narrative = [ showHarryBothMarbles ]
            }
         :: { summary = "show red marble"
-           , interaction = withCharacter "Harry"
+           , interaction = with "Harry"
            , conditions =
                 [ currentLocationIs "Marsh"
                 , itemIsInInventory "RedMarble"
@@ -90,7 +90,7 @@ rulesData =
            , narrative = [ showHarryOneMarble ]
            }
         :: { summary = "show green marble"
-           , interaction = withCharacter "Harry"
+           , interaction = with "Harry"
            , conditions =
                 [ currentLocationIs "Marsh"
                 , itemIsInInventory "GreenMarble"
@@ -100,7 +100,7 @@ rulesData =
            , narrative = [ showHarryOneMarble ]
            }
         :: { summary = "starts raining"
-           , interaction = withLocation "Marsh"
+           , interaction = with "Marsh"
            , conditions =
                 [ itemIsNotInLocation "Rain" "Marsh"
                 , currentSceneIs "searchForMarbles"
@@ -112,7 +112,7 @@ rulesData =
            , narrative = [ "It's starting to rain!" ]
            }
         :: { summary = "in rain with umbrella"
-           , interaction = withLocation "Marsh"
+           , interaction = with "Marsh"
            , conditions =
                 [ itemIsInLocation "Rain" "Marsh"
                 , itemIsInInventory "Umbrella"
@@ -122,7 +122,7 @@ rulesData =
            , narrative = [ "Still raining.  Good thing I brought my brolly!" ]
            }
         :: { summary = "in rain without umbrella"
-           , interaction = withLocation "Marsh"
+           , interaction = with "Marsh"
            , conditions =
                 [ itemIsInLocation "Rain" "Marsh"
                 , itemIsNotInInventory "Umbrella"
@@ -132,7 +132,7 @@ rulesData =
            , narrative = [ "I'm getting all wet!  How miserable.  Foolish of me to leave my brolly at home on a day like this!" ]
            }
         :: { summary = "reveal red marble"
-           , interaction = withItem "Umbrella"
+           , interaction = with "Umbrella"
            , conditions =
                 [ currentLocationIs "Marsh"
                 , itemIsInLocation "Rain" "Marsh"
@@ -144,7 +144,7 @@ rulesData =
            , narrative = [ revealRedMarble ]
            }
         :: { summary = "find red marble"
-           , interaction = withItem "SomethingRedAndShiny"
+           , interaction = with "SomethingRedAndShiny"
            , conditions =
                 [ currentSceneIs "searchForMarbles"
                 ]
@@ -155,7 +155,7 @@ rulesData =
            , narrative = [ "Hey, it's Harry's red marble!" ]
            }
         :: { summary = "red marble description"
-           , interaction = withItem "RedMarble"
+           , interaction = with "RedMarble"
            , conditions =
                 [ currentSceneIs "searchForMarbles"
                 ]
@@ -163,7 +163,7 @@ rulesData =
            , narrative = redMarble
            }
         :: { summary = "reveal green marble"
-           , interaction = withItem "VegatableGarden"
+           , interaction = with "VegatableGarden"
            , conditions =
                 [ itemIsNotInInventory "GreenMarble"
                 , currentSceneIs "searchForMarbles"
@@ -172,7 +172,7 @@ rulesData =
            , narrative = [ revealGreenMarble ]
            }
         :: { summary = "find green marble"
-           , interaction = withItem "SomethingGreenAndShiny"
+           , interaction = with "SomethingGreenAndShiny"
            , conditions =
                 [ currentSceneIs "searchForMarbles"
                 ]
@@ -183,7 +183,7 @@ rulesData =
            , narrative = [ "It's Harry's green marble!  How did that get there?" ]
            }
         :: { summary = "green marble description"
-           , interaction = withItem "GreenMarble"
+           , interaction = with "GreenMarble"
            , conditions =
                 [ currentSceneIs "searchForMarbles"
                 ]
@@ -193,7 +193,7 @@ rulesData =
         -- bringMarbleHome
         ::
             { summary = "bring red marble home"
-            , interaction = withLocation "Home"
+            , interaction = with "Home"
             , conditions =
                 [ itemIsInInventory "RedMarble"
                 , currentSceneIs "bringMarbleHome"
@@ -207,7 +207,7 @@ rulesData =
                 [ "Well, that's quite enough adventuring for today.  I think I'll just put on some tea and wait for Harry to come around." ]
             }
         :: { summary = "bring green marble home"
-           , interaction = withLocation "Home"
+           , interaction = with "Home"
            , conditions =
                 [ itemIsInInventory "GreenMarble"
                 , currentSceneIs "bringMarbleHome"
@@ -258,7 +258,7 @@ rulesData =
            , narrative = [ "I really think I should just do as Harry asked." ]
            }
         :: { summary = "no more to say"
-           , interaction = withCharacter "Harry"
+           , interaction = with "Harry"
            , conditions =
                 [ currentSceneIs "bringMarbleHome"
                 ]
@@ -268,7 +268,7 @@ rulesData =
         -- goToPub
         ::
             { summary = "go to pub with Harry"
-            , interaction = withLocation "Pub"
+            , interaction = with "Pub"
             , conditions =
                 [ currentLocationIsNot "Pub"
                 , currentSceneIs "goToPub"
@@ -281,7 +281,7 @@ rulesData =
             , narrative = []
             }
         :: { summary = "cheers"
-           , interaction = withItem "Pint"
+           , interaction = with "Pint"
            , conditions =
                 [ currentSceneIs "goToPub"
                 ]
