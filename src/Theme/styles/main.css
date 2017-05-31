@@ -47,71 +47,6 @@ img {
   margin: 5px;
 }
 
-.TitlePage {
-  width: 900px;
-  min-height: 100%;
-  margin: auto;
-  padding: 20px;
-  color: #555;
-  font-family: helvetica;
-  font-size: 16px;
-  font-weight: normal;
-  background-color: white;
-}
-
-.TitlePage__Title {
-  text-align: center;
-  color: white;
-  background-color: #333;
-  padding: 10px;
-  font-size: 22px;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.TitlePage__Byline {
-  text-align: center;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: italic;
-  margin-bottom: 30px;
-}
-
-.TitlePage__Prologue {
-  margin-bottom: 50px;
-  padding: 0px 40px;
-}
-
-.TitlePage__StartGame {
-  font-weight: normal;
-  font-size: 30px;
-  text-align: center;
-  text-decoration: underline;
-  text-align: center;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 40px;
-  width: 90px;
-}
-
-.TitlePage__Loading {
-  font-weight: normal;
-  font-size: 25px;
-  text-align: center;
-  text-align: center;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 40px;
-  width: 90px;
-}
-
-.TitlePage__StartGame:hover {
-  color: #000;
-  cursor: pointer;
-}
-
 .GamePage {
   margin: auto;
   display: flex;
@@ -175,7 +110,6 @@ img {
 
 .Storyline__Item {
   opacity: 0.3;
-  width: 600px;
   padding: 20px 10px;
   position: relative;
   border-bottom: 1px solid #ccc;

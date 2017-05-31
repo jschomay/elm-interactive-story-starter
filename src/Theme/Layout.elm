@@ -14,7 +14,7 @@ view :
     { currentLocation : Entity
     , itemsInCurrentLocation : List Entity
     , charactersInCurrentLocation : List Entity
-    , locations : List Entity
+    , exits : List ( Direction, Entity )
     , itemsInInventory : List Entity
     , ending : Maybe String
     , storyLine : List StorySnippet
@@ -40,7 +40,7 @@ view displayState =
                 ]
             , div [ class "Layout__Sidebar" ]
                 [ Theme.Locations.view
-                    displayState.locations
+                    displayState.exits
                     displayState.currentLocation
                 , Theme.Inventory.view
                     displayState.itemsInInventory

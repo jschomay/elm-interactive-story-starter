@@ -6,407 +6,232 @@ import ClientTypes exposing (..)
 
 rulesData : List (RuleData Engine.Rule)
 rulesData =
-    []
-        -- learnOfMystery
-        ++
-            { summary = "get note from harry"
-            , interaction = with "Harry"
-            , conditions =
-                [ currentLocationIs "Garden"
-                , currentSceneIs "learnOfMystery"
-                ]
-            , changes =
-                [ moveCharacterToLocation "Harry" "Marsh"
-                , moveItemToInventory "NoteFromHarry"
-                ]
-            , narrative = [ harryGivesNote ]
-            }
-        :: { summary = "read harry's note"
-           , interaction = with "NoteFromHarry"
-           , conditions =
-                [ currentSceneIs "learnOfMystery"
-                ]
-           , changes = [ addLocation "Marsh" ]
-           , narrative = noteFromHarry
-           }
-        :: { summary = "go to marsh"
-           , interaction = with "Marsh"
-           , conditions =
-                [ itemIsInInventory "NoteFromHarry"
-                , currentSceneIs "learnOfMystery"
-                ]
-           , changes =
-                [ moveTo "Marsh"
-                , moveItemOffScreen "NoteFromHarry"
-                ]
-           , narrative = []
-           }
-        :: { summary = "harry asks for help"
-           , interaction = with "Harry"
-           , conditions =
-                [ currentLocationIs "Marsh"
-                , currentSceneIs "learnOfMystery"
-                ]
-           , changes = [ loadScene "searchForMarbles" ]
-           , narrative = [ harryAsksForHelp ]
-           }
-        -- searchForMarbles
-        ::
-            { summary = "more about marbles"
-            , interaction = with "Harry"
-            , conditions =
-                [ currentLocationIs "Marsh"
-                , itemIsNotInInventory "RedMarble"
-                , itemIsNotInInventory "GreenMarble"
-                , currentSceneIs "searchForMarbles"
-                ]
-            , changes = []
-            , narrative = talkWithHarry
-            }
-        :: { summary = "show both marbles"
-           , interaction = with "Harry"
-           , conditions =
-                [ currentLocationIs "Marsh"
-                , itemIsInInventory "RedMarble"
-                , itemIsInInventory "GreenMarble"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes =
-                [ addLocation "Pub"
-                , loadScene "goToPub"
-                , moveItemOffScreen "GreenMarble"
-                , moveItemOffScreen "RedMarble"
-                ]
-           , narrative = [ showHarryBothMarbles ]
-           }
-        :: { summary = "show red marble"
-           , interaction = with "Harry"
-           , conditions =
-                [ currentLocationIs "Marsh"
-                , itemIsInInventory "RedMarble"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes = [ loadScene "bringMarbleHome" ]
-           , narrative = [ showHarryOneMarble ]
-           }
-        :: { summary = "show green marble"
-           , interaction = with "Harry"
-           , conditions =
-                [ currentLocationIs "Marsh"
-                , itemIsInInventory "GreenMarble"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes = [ loadScene "bringMarbleHome" ]
-           , narrative = [ showHarryOneMarble ]
-           }
-        :: { summary = "starts raining"
-           , interaction = with "Marsh"
-           , conditions =
-                [ itemIsNotInLocation "Rain" "Marsh"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes =
-                [ moveTo "Marsh"
-                , moveItemToLocationFixed "Rain" "Marsh"
-                ]
-           , narrative = [ "It's starting to rain!" ]
-           }
-        :: { summary = "in rain with umbrella"
-           , interaction = with "Marsh"
-           , conditions =
-                [ itemIsInLocation "Rain" "Marsh"
-                , itemIsInInventory "Umbrella"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes = [ moveTo "Marsh" ]
-           , narrative = [ "Still raining.  Good thing I brought my brolly!" ]
-           }
-        :: { summary = "in rain without umbrella"
-           , interaction = with "Marsh"
-           , conditions =
-                [ itemIsInLocation "Rain" "Marsh"
-                , itemIsNotInInventory "Umbrella"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes = [ moveTo "Marsh" ]
-           , narrative = [ "I'm getting all wet!  How miserable.  Foolish of me to leave my brolly at home on a day like this!" ]
-           }
-        :: { summary = "reveal red marble"
-           , interaction = with "Umbrella"
-           , conditions =
-                [ currentLocationIs "Marsh"
-                , itemIsInLocation "Rain" "Marsh"
-                , itemIsNotInInventory "RedMarble"
-                , itemIsNotInLocation "SomethingRedAndShiny" "Marsh"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes = [ moveItemToLocation "SomethingRedAndShiny" "Marsh" ]
-           , narrative = [ revealRedMarble ]
-           }
-        :: { summary = "find red marble"
-           , interaction = with "SomethingRedAndShiny"
-           , conditions =
-                [ currentSceneIs "searchForMarbles"
-                ]
-           , changes =
-                [ moveItemToInventory "RedMarble"
-                , moveItemOffScreen "SomethingRedAndShiny"
-                ]
-           , narrative = [ "Hey, it's Harry's red marble!" ]
-           }
-        :: { summary = "red marble description"
-           , interaction = with "RedMarble"
-           , conditions =
-                [ currentSceneIs "searchForMarbles"
-                ]
-           , changes = []
-           , narrative = redMarble
-           }
-        :: { summary = "reveal green marble"
-           , interaction = with "VegatableGarden"
-           , conditions =
-                [ itemIsNotInInventory "GreenMarble"
-                , currentSceneIs "searchForMarbles"
-                ]
-           , changes = [ moveItemToLocation "SomethingGreenAndShiny" "Garden" ]
-           , narrative = [ revealGreenMarble ]
-           }
-        :: { summary = "find green marble"
-           , interaction = with "SomethingGreenAndShiny"
-           , conditions =
-                [ currentSceneIs "searchForMarbles"
-                ]
-           , changes =
-                [ moveItemToInventory "GreenMarble"
-                , moveItemOffScreen "SomethingGreenAndShiny"
-                ]
-           , narrative = [ "It's Harry's green marble!  How did that get there?" ]
-           }
-        :: { summary = "green marble description"
-           , interaction = with "GreenMarble"
-           , conditions =
-                [ currentSceneIs "searchForMarbles"
-                ]
-           , changes = []
-           , narrative = greenMarble
-           }
-        -- bringMarbleHome
-        ::
-            { summary = "bring red marble home"
-            , interaction = with "Home"
-            , conditions =
-                [ itemIsInInventory "RedMarble"
-                , currentSceneIs "bringMarbleHome"
-                ]
-            , changes =
-                [ moveTo "Home"
-                , moveItemToLocation "RedMarble" "Home"
-                , endStory "Ending 1 of 2: All's well that ends well, though a bit lonely."
-                ]
-            , narrative =
-                [ "Well, that's quite enough adventuring for today.  I think I'll just put on some tea and wait for Harry to come around." ]
-            }
-        :: { summary = "bring green marble home"
-           , interaction = with "Home"
-           , conditions =
-                [ itemIsInInventory "GreenMarble"
-                , currentSceneIs "bringMarbleHome"
-                ]
-           , changes =
-                [ moveTo "Home"
-                , moveItemToLocation "GreenMarble" "Home"
-                , endStory "Ending 1 of 2: All's well that ends well, though a bit lonely."
-                ]
-           , narrative =
-                [ "Well, that's quite enough adventuring for today.  I think I'll just put on some tea and wait for Harry to come around." ]
-           }
-        :: { summary = "lonely ending"
-           , interaction = withAnything
-           , conditions =
-                [ currentSceneIs "bringMarbleHome"
-                , currentLocationIs "Home"
-                ]
-           , changes = []
-           , narrative =
-                [ "Ah yes, lovely tea."
-                , "Harry hasn't show up yet.  I wonder if he'll find his other marble."
-                , "Might do another cup of tea."
-                , "I don't think Harry's coming."
-                , "I really do think the adventure is over now."
-                , "The end."
-                , "Or is it?"
-                , "Yes, it really is.  The end."
-                , "The end."
-                ]
-           }
-        :: { summary = "focus on getting home"
-           , interaction = withAnyItem
-           , conditions =
-                [ currentLocationIsNot "Home"
-                , currentSceneIs "bringMarbleHome"
-                ]
-           , changes = []
-           , narrative = [ "Harry wants me to bring his marble safely home.  I wouldn't mind a nice cup of tea besides." ]
-           }
-        :: { summary = "go where harry said"
+    { summary = "leaving without cape"
+    , interaction = withAnyLocation
+    , conditions =
+        [ currentLocationIs "Cottage"
+        , itemIsNotInInventory "Cape"
+        ]
+    , changes =
+        []
+    , narrative =
+        [ """
+"Oh Little Red Riding Hood," her mother called out, "don't forget your cape.  It might be cold in the woods."
+"""
+        ]
+    }
+        :: { summary = "leaving without basket"
            , interaction = withAnyLocation
            , conditions =
-                [ currentLocationIsNot "Home"
-                , currentSceneIs "bringMarbleHome"
+                [ currentLocationIs "Cottage"
+                , itemIsNotInInventory "Basket of food"
                 ]
-           , changes = []
-           , narrative = [ "I really think I should just do as Harry asked." ]
-           }
-        :: { summary = "no more to say"
-           , interaction = with "Harry"
-           , conditions =
-                [ currentSceneIs "bringMarbleHome"
-                ]
-           , changes = []
-           , narrative = [ "\"Go on now Bartholomew, keep that safe for me.\"" ]
-           }
-        -- goToPub
-        ::
-            { summary = "go to pub with Harry"
-            , interaction = with "Pub"
-            , conditions =
-                [ currentLocationIsNot "Pub"
-                , currentSceneIs "goToPub"
-                ]
-            , changes =
-                [ moveTo "Pub"
-                , moveCharacterToLocation "Harry" "Pub"
-                , endStory "Ending 2 of 2: No better way to end an adventure, than with a pint in the pub with a good friend!"
-                ]
-            , narrative = []
-            }
-        :: { summary = "cheers"
-           , interaction = with "Pint"
-           , conditions =
-                [ currentSceneIs "goToPub"
-                ]
-           , changes = []
-           , narrative = [ "Cheers Harry!  To the next adventure." ]
-           }
-        :: { summary =
-                "focus on going to pub"
-           , interaction = withAnything
-           , conditions =
-                [ currentLocationIsNot "Pub"
-                , currentSceneIs "goToPub"
-                ]
-           , changes = []
-           , narrative = [ "Right now I just really want a pint!" ]
-           }
-        :: { summary = "good ending"
-           , interaction = withAnything
-           , conditions =
-                [ currentLocationIs "Pub"
-                , currentSceneIs "goToPub"
-                ]
-           , changes = []
+           , changes =
+                []
            , narrative =
-                [ "Another daring adventure, finished."
-                , "There's nothing more to do, not until the next adventure."
-                , "The end."
+                [ """
+ "Oh Little Red Riding Hood," her mother called out, "don't forget the basket of food to bring to Grandma!"
+"""
+                ]
+           }
+        :: { summary = "describe cottage"
+           , interaction = with "Cottage"
+           , conditions =
+                [ currentLocationIs "Cottage"
+                ]
+           , changes =
+                []
+           , narrative =
+                [ """
+The cottage where Little Red Riding Hood and her mother live.
+"""
+                ]
+           }
+        :: { summary = "trying to jump directly from Cottage to Grandma's house"
+           , interaction = with "Grandma's house"
+           , conditions =
+                [ currentLocationIs "Cottage"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                ]
+           , changes =
+                []
+           , narrative =
+                [ """
+The way to Grandma's house is over the river and through the woods.
+"""
+                ]
+           }
+        :: { summary = "trying to jump directly from River to Grandma's house"
+           , interaction = with "Grandma's house"
+           , conditions =
+                [ currentLocationIs "River"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                ]
+           , changes =
+                []
+           , narrative =
+                [ """
+The way to Grandma's house is through the woods.
+"""
+                ]
+           }
+        :: { summary = "trying to jump directly from Cottage to Woods"
+           , interaction = with "Woods"
+           , conditions =
+                [ currentLocationIs "Cottage"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                ]
+           , changes =
+                []
+           , narrative =
+                [ """
+The woods are on the other side of the river.
+"""
+                ]
+           }
+        :: { summary = "going back to the Cottage"
+           , interaction = with "Cottage"
+           , conditions =
+                [ currentLocationIsNot "Cottage"
+                ]
+           , changes =
+                []
+           , narrative =
+                [ """
+Little Red Riding Hood knew that her mother would be cross if she did not bring the basket of food to Grandma.
+"""
+                ]
+           }
+        :: { summary = "leaving the Cottage"
+           , interaction = with "River"
+           , conditions =
+                [ currentLocationIs "Cottage"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                ]
+           , changes =
+                [ moveTo "River"
+                , moveCharacterToLocation "Little Red Riding Hood" "River"
+                ]
+           , narrative =
+                [ """
+Little Red Riding Hood skipped out of the cottage, singing a happy song and swinging the basket of food by her side.  Soon she arrived at the old bridge that went over the river.  On the other side of the bridge were the woods where Grandma lived.
+"""
+                ]
+           }
+        :: { summary = "going from Woods to River"
+           , interaction = with "River"
+           , conditions =
+                [ currentLocationIs "Woods"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                ]
+           , changes =
+                []
+           , narrative =
+                [ """
+Grandma's house is the other direction.
+"""
+                , """
+The wolf was still there, trying to hide the hungry look in his eye.
+"""
+                ]
+           }
+        :: { summary = "entering the Woods"
+           , interaction = with "Woods"
+           , conditions =
+                [ currentLocationIs "River"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                , characterIsInLocation "Wolf" "Woods"
+                ]
+           , changes =
+                [ moveTo "Woods"
+                , moveCharacterToLocation "Little Red Riding Hood" "Woods"
+                ]
+           , narrative =
+                [ """
+Little Red Riding Hood followed the path deep into the woods.  Birds chirped in the trees high above, and squirrels scampered up the trunks, looking for nuts.  Little Red Riding Hood loved the woods and all of the animals that lived there.
+
+At first, Little Red Riding Hood did not see the wolf spying on her in the shadows, looking at her basket of food and licking his chops.  He was a crafty wolf, and came up with a plan.
+
+Putting on his best smile, the wolf greeted Little Red Riding Hood.  "Good morning my pretty child.  What a lovely cape you have on.  May I ask, where are you going with that delicious looking basket of food?"
+"""
+                ]
+           }
+        :: { summary = "ignoring the wolf"
+           , interaction = with "Grandma's house"
+           , conditions =
+                [ currentLocationIs "Woods"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                , characterIsInLocation "Wolf" "Woods"
+                ]
+           , changes =
+                [ moveTo "Grandma's house"
+                , moveCharacterToLocation "Little Red Riding Hood" "Grandma's house"
+                , endStory "The End"
+                ]
+           , narrative =
+                [ """
+Little Red Riding Hood remembered her mother's warning about not talking to strangers, and hurried away to Grandma's house.
+
+Grandma was so happy to see Little Red Riding Hood, and they ate the goodies she had brought, and everyone lived happily ever after.
+"""
+                ]
+           }
+        :: { summary = "talking to the wolf in the Woods"
+           , interaction = with "Wolf"
+           , conditions =
+                [ currentLocationIs "Woods"
+                , itemIsInInventory "Cape"
+                , itemIsInInventory "Basket of food"
+                , characterIsInLocation "Wolf" "Woods"
+                ]
+           , changes =
+                [ moveCharacterToLocation "Wolf" "Grandma's house"
+                , moveCharacterOffScreen "Grandma"
+                ]
+           , narrative =
+                [ """
+Little Red Riding Hood thought the wolf looked so kind and so friendly that she happily told him, "I'm going to visit Grandma, who lives in these woods.  She isn't feeling well, so I am bringing her a basket of food."
+
+The wolf muttered "That's very interesting.  I hope she feels better soon."  Then he made a funny little bow and scampered off down the path.
+"""
+                ]
+           }
+        :: { summary = "finding the wolf at Grandma's house"
+           , interaction = with "Grandma's house"
+           , conditions =
+                [ currentLocationIs "Woods"
+                , characterIsInLocation "Wolf" "Grandma's house"
+                ]
+           , changes =
+                [ moveTo "Grandma's house"
+                , moveCharacterToLocation "Little Red Riding Hood" "Grandma's house"
+                , endStory "The End"
+                ]
+           , narrative =
+                [ """
+Little Red Riding Hood found the door to Grandma's house unlocked, so she went in.  She saw Grandma sleeping in the bed with the covers pulled high over her face, and her nightcap pulled low over her forehead.
+
+But she looked a little different than usual.  Little Red Riding Hood did not know that the wolf had ran to Grandma's house before her, and eaten Grandma up, and was now lying in her bed pretending to be Grandma!
+
+"Grandma, what big eyes you have."
+
+"The better to see you with, my dear," said the wolf, as softly as he could.
+
+"And Grandma, what big ears you have."
+
+"The better to hear you with, my dear."
+
+"And Grandma, what big teeth you have!"
+
+"The better to gobble you up with!"  And the wolf jumped out of bed and that is exactly what he did.  And that is why we don't talk to strangers.
+"""
                 ]
            }
         :: []
-
-
-harryGivesNote : String
-harryGivesNote =
-    """
-Ah, my dear colleague Harry.
-
-"Alright Harry?  What are you getting up to today?"
-
-What's this?  He's given me a note.  And now he's run off.
-
-How peculiar.
-"""
-
-
-noteFromHarry : List String
-noteFromHarry =
-    [ "It says, \"*Meet me in the marsh.*\""
-    , "I wonder what Harry could possibly be doing in the marsh."
-    , "He's expecting me.  I better go find him."
-    ]
-
-
-harryAsksForHelp : String
-harryAsksForHelp =
-    """"Bartholomew, my friend!  Thanks for coming."
-
-"What is it Harry?  Why have you brought me here?"
-
-"I didn't want to say this earlier, but..."
-
-"Yes?"
-
-"I seem to have lost my marbles.  I've been all over looking for them."
-
-"Will you help me find them?"
-"""
-
-
-talkWithHarry : List String
-talkWithHarry =
-    [ "\"I'm still missing a red and a green one.\""
-    , "Poor Harry.  Not the sharpest tool in the shed.  But a good mate, always ready for a pint."
-    , "\"Have you found one yet?\""
-    ]
-
-
-showHarryOneMarble : String
-showHarryOneMarble =
-    """
-"Harry, I've found one!"
-
-"Let's see...  Ah yes, well done Bartholomew!  That's lovely.  But there's still one more left.
-
-Bring this to your house to keep it safe, and I'll keep looking for the other one.  I'll pop by later to pick it up."
-"""
-
-
-showHarryBothMarbles : String
-showHarryBothMarbles =
-    """
-"Harry, look what I've found!"
-
-"Let's see...  My red marble.  And my green one too!  Well done Bartholomew, you found both of them, smashing!  Job done, let's nip off to the pub for a pint."
-
-"Right, off to the pub!"
-"""
-
-
-revealRedMarble : String
-revealRedMarble =
-    """Good thing I brought my brolly.
-
-Hey... there's something shiny down there in the moss.  What is it?
-"""
-
-
-redMarble : List String
-redMarble =
-    [ "It's a bright, red, perfectly round, glass marble.  It feels cool to the touch, and heavier than it looks for its size.  "
-    , "I should go show Harry."
-    ]
-
-
-revealGreenMarble : String
-revealGreenMarble =
-    """Looking for Harry's marbles is a bore, maybe I'll just do a bit of gardening.
-
-Hold on... what's this?
-"""
-
-
-greenMarble : List String
-greenMarble =
-    [ "This is a nice marble!  I can see swirls of blues and greens suspended in the dark glass when I hold it up to the light."
-    , "Harry will definitely be happy I found it!"
-    , "I should go show Harry."
-    ]

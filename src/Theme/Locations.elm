@@ -1,7 +1,6 @@
 module Theme.Locations exposing (..)
 
 import Html exposing (..)
-import Html.Keyed
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ClientTypes exposing (..)
@@ -9,39 +8,29 @@ import Components exposing (..)
 
 
 view :
-    List Entity
+    List ( Direction, Entity )
     -> Entity
     -> Html Msg
-view locations currentLocation =
+view exits currentLocation =
     let
-        classes locationId =
-            classList
-                [ ( "Locations__Location", True )
-                , ( "Locations__Location--current", locationId == currentLocation.id )
-                , ( "u-selectable", True )
-                ]
-
-        numLocations =
-            List.length locations
-
-        locationItem i entity =
-            let
-                key =
-                    (toString entity.id) ++ (toString <| numLocations - i)
-            in
-                ( key
-                , li
-                    ([ classes entity.id
-                     , onClick <| Interact entity.id
-                     ]
+        exitsList =
+            exits
+                |> List.map
+                    (\( direction, entity ) ->
+                        p
+                            []
+                            [ span
+                                [ class "CurrentSummary__StoryElement u-selectable"
+                                , onClick <| Interact entity.id
+                                ]
+                                [ text <| .name <| getDisplay entity ]
+                            , text <| " is to the " ++ toString direction ++ "."
+                            ]
                     )
-                    [ text <| .name <| getDisplay entity ]
-                )
+                |> div []
     in
         div [ class "Locations" ]
-            [ h3 [] [ text "Known locations" ]
+            [ h3 [] [ text "Connecting locations" ]
             , div [ class "Locations__list" ]
-                [ Html.Keyed.ol []
-                    (List.indexedMap locationItem locations)
-                ]
+                [ exitsList ]
             ]

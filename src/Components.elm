@@ -40,3 +40,13 @@ getStyle entity =
                             Nothing
                 )
             |> Maybe.withDefault errorMsg
+
+
+getExits : Entity -> Exits
+getExits entity =
+    case Dict.get "connectedLocations" entity.components of
+        Just (ConnectedLocations exits) ->
+            exits
+
+        _ ->
+            []

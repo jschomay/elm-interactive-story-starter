@@ -4,7 +4,6 @@ import Engine exposing (..)
 import Manifest exposing (..)
 import Rules exposing (rulesData)
 import Html exposing (..)
-import Theme.TitlePage
 import Theme.Layout
 import ClientTypes exposing (..)
 import Components exposing (..)
@@ -14,7 +13,6 @@ import List.Zipper as Zipper exposing (Zipper)
 
 type alias Model =
     { engineModel : Engine.Model
-    , route : Route
     , loaded : Bool
     , storyLine : List StorySnippet
     , content : Dict String (Maybe (Zipper String))
@@ -94,14 +92,18 @@ init : ( Model, Cmd ClientTypes.Msg )
 init =
     let
         startingState =
-            [ loadScene "learnOfMystery"
-            , moveTo "Home"
-            , moveItemToLocation "Umbrella" "Home"
-            , moveItemToLocationFixed "VegatableGarden" "Garden"
-            , addLocation "Home"
-            , addLocation "Garden"
-            , moveCharacterToLocation "Harry" "Garden"
-            , moveItemToLocation "Pint" "Pub"
+            [ moveTo "Cottage"
+            , loadScene "start"
+            , addLocation "Cottage"
+            , addLocation "River"
+            , addLocation "Woods"
+            , addLocation "Grandma's house"
+            , moveItemToLocation "Cape" "Cottage"
+            , moveItemToLocation "Basket of food" "Cottage"
+            , moveCharacterToLocation "Little Red Riding Hood" "Cottage"
+            , moveCharacterToLocation "Mother" "Cottage"
+            , moveCharacterToLocation "Wolf" "Woods"
+            , moveCharacterToLocation "Grandma" "Grandma's house"
             ]
     in
         ( { engineModel =
@@ -112,12 +114,15 @@ init =
                     }
                     pluckRules
                     |> Engine.changeWorld startingState
-          , route = TitlePage
           , loaded = False
           , storyLine =
-                [ { interactableName = "Begin"
+                [ { interactableName = "Mother"
                   , interactableCssSelector = ""
-                  , narrative = "Ahh, a brand new day.  I wonder what I will get up to.  There's no telling who I will meet, what I will find, where I will go..."
+                  , narrative = """
+Once upon a time there was a young girl named Little Red Riding Hood, because she was so fond of her red cape that her grandma gave to her.
+
+One day, her mother said to her, "Little Red Riding Hood, take this basket of food to your Grandma, who lives in the woods, because she is not feeling well.  And remember, don't talk to strangers on the way!"
+"""
                   }
                 ]
           , content = pluckContent
@@ -131,42 +136,40 @@ update :
     -> Model
     -> ( Model, Cmd ClientTypes.Msg )
 update msg model =
-    case msg of
-        Interact interactableId ->
-            let
-                ( newEngineModel, maybeMatchedRuleId ) =
-                    Engine.update interactableId model.engineModel
+    if Engine.getEnding model.engineModel /= Nothing then
+        ( model, Cmd.none )
+    else
+        case msg of
+            Interact interactableId ->
+                let
+                    ( newEngineModel, maybeMatchedRuleId ) =
+                        Engine.update interactableId model.engineModel
 
-                narrative =
-                    { interactableName = findEntity interactableId |> getDisplay |> .name
-                    , interactableCssSelector = findEntity interactableId |> getStyle
-                    , narrative =
-                        getNarrative model.content maybeMatchedRuleId
-                            |> Maybe.withDefault (findEntity interactableId |> getDisplay |> .description)
-                    }
+                    narrative =
+                        { interactableName = findEntity interactableId |> getDisplay |> .name
+                        , interactableCssSelector = findEntity interactableId |> getStyle
+                        , narrative =
+                            getNarrative model.content maybeMatchedRuleId
+                                |> Maybe.withDefault (findEntity interactableId |> getDisplay |> .description)
+                        }
 
-                updatedContent =
-                    maybeMatchedRuleId
-                        |> Maybe.map (\id -> Dict.update id updateContent model.content)
-                        |> Maybe.withDefault model.content
-            in
-                ( { model
-                    | engineModel = newEngineModel
-                    , storyLine = narrative :: model.storyLine
-                    , content = updatedContent
-                  }
+                    updatedContent =
+                        maybeMatchedRuleId
+                            |> Maybe.map (\id -> Dict.update id updateContent model.content)
+                            |> Maybe.withDefault model.content
+                in
+                    ( { model
+                        | engineModel = newEngineModel
+                        , storyLine = narrative :: model.storyLine
+                        , content = updatedContent
+                      }
+                    , Cmd.none
+                    )
+
+            Loaded ->
+                ( { model | loaded = True }
                 , Cmd.none
                 )
-
-        StartGame ->
-            ( { model | route = GamePage }
-            , Cmd.none
-            )
-
-        Loaded ->
-            ( { model | loaded = True }
-            , Cmd.none
-            )
 
 
 port loaded : (Bool -> msg) -> Sub msg
@@ -199,32 +202,32 @@ view :
     Model
     -> Html ClientTypes.Msg
 view model =
-    case model.route of
-        TitlePage ->
-            Theme.TitlePage.view StartGame model.loaded
+    let
+        currentLocation =
+            Engine.getCurrentLocation model.engineModel
+                |> findEntity
 
-        GamePage ->
-            let
-                displayState =
-                    { currentLocation =
-                        Engine.getCurrentLocation model.engineModel
-                            |> findEntity
-                    , itemsInCurrentLocation =
-                        Engine.getItemsInCurrentLocation model.engineModel
-                            |> List.map findEntity
-                    , charactersInCurrentLocation =
-                        Engine.getCharactersInCurrentLocation model.engineModel
-                            |> List.map findEntity
-                    , locations =
-                        Engine.getLocations model.engineModel
-                            |> List.map findEntity
-                    , itemsInInventory =
-                        Engine.getItemsInInventory model.engineModel
-                            |> List.map findEntity
-                    , ending =
-                        Engine.getEnding model.engineModel
-                    , storyLine =
-                        model.storyLine
-                    }
-            in
-                Theme.Layout.view displayState
+        displayState =
+            { currentLocation = currentLocation
+            , itemsInCurrentLocation =
+                Engine.getItemsInCurrentLocation model.engineModel
+                    |> List.map findEntity
+            , charactersInCurrentLocation =
+                Engine.getCharactersInCurrentLocation model.engineModel
+                    |> List.map findEntity
+            , exits =
+                getExits currentLocation
+                    |> List.map
+                        (\( direction, id ) ->
+                            ( direction, findEntity id )
+                        )
+            , itemsInInventory =
+                Engine.getItemsInInventory model.engineModel
+                    |> List.map findEntity
+            , ending =
+                Engine.getEnding model.engineModel
+            , storyLine =
+                model.storyLine
+            }
+    in
+        Theme.Layout.view displayState

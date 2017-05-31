@@ -14,6 +14,11 @@ addStyle selector components =
     Dict.insert "style" (Style selector) components
 
 
+addDirections : List ( Direction, String ) -> Components -> Components
+addDirections exits components =
+    Dict.insert "connectedLocations" (ConnectedLocations exits) components
+
+
 item : String -> String -> Entity
 item name description =
     { id = name
@@ -21,10 +26,13 @@ item name description =
     }
 
 
-location : String -> String -> Entity
-location name description =
+location : String -> String -> List ( Direction, String ) -> Entity
+location name description exits =
     { id = name
-    , components = display name description |> addStyle name
+    , components =
+        display name description
+            |> addStyle name
+            |> addDirections exits
     }
 
 
@@ -37,27 +45,24 @@ character name description =
 
 items : List Entity
 items =
-    [ item "Umbrella" "My trusty brolly -- I take it everywhere."
-    , item "Rain" "I don't mind the rain really, unless I've forgotten my brolly."
-    , item "RedMarble" "Harry's marble!  It's lovely, isn't it?"
-    , item "GreenMarble" "Harry's marble!  It's lovely, isn't it?"
-    , item "SomethingRedAndShiny" "What is that?  Is it...?  It's a marble!"
-    , item "SomethingGreenAndShiny" "What is that?  Is it...?  It's a marble!"
-    , item "NoteFromHarry" "Very mysterious business, this.  I wonder what Harry wants in the marsh?"
-    , item "VegatableGarden" "My veg patch needs some tidying up.  The cucumbers are so overgrown!"
-    , item "Pint" "Cheers!"
+    [ item "Cape" "Little Red Riding Hood's namesake."
+    , item "Basket of food" "Some goodies to take to Grandma."
     ]
 
 
 characters : List Entity
 characters =
-    [ character "Harry" "Not the sharpest tool in the shed, but a good mate, always ready for a pint." ]
+    [ character "Little Red Riding Hood" "Sweet and innocent, she spent her days playing around her cottage where she lived with her mother."
+    , character "Mother" "Little Red Riding Hood's mother, who looks after her."
+    , character "Wolf" "A very sly and clever wolf, who lives in the woods."
+    , character "Grandma" "Little Red Riding Hood's grandmother, who lives alone in a cottage in the woods."
+    ]
 
 
 locations : List Entity
 locations =
-    [ location "Home" "Home sweet home.  There's nowhere I'd rather be.  Unless I'm out having an adventure."
-    , location "Garden" "The garden is lovely.  The marigolds are in full bloom.  I really do need to tend to the vegetable patch though."
-    , location "Marsh" "Ugh, the ground is quite damp and squishy.  What in the blazes is Harry doing out here?"
-    , location "Pub" "As Samuel Johnson said, \"There is nothing which has yet been contrived by man, by which so much happiness is produced as by a good tavern or inn.\""
+    [ location "Cottage" "The cottage where Little Red Riding Hood and her mother live." [ ( East, "River" ) ]
+    , location "River" "A river that runs by Little Red Riding Hood's cottage." [ ( West, "Cottage" ), ( East, "Woods" ) ]
+    , location "Woods" "The forests that surround Little Red Riding Hood's cottage." [ ( West, "River" ), ( East, "Grandma's house" ) ]
+    , location "Grandma's house" "The cabin in the woods where Grandma lives alone." []
     ]
