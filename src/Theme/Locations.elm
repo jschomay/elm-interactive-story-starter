@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ClientTypes exposing (..)
 import Components exposing (..)
+import Tuple
 
 
 view :
@@ -21,9 +22,9 @@ view exits currentLocation =
                             []
                             [ span
                                 [ class "CurrentSummary__StoryElement u-selectable"
-                                , onClick <| Interact entity.id
+                                , onClick <| Interact <| Tuple.first entity
                                 ]
-                                [ text <| .name <| getDisplay entity ]
+                                [ text <| .name <| getDisplayInfo entity ]
                             , text <| " is to the " ++ toString direction ++ "."
                             ]
                     )

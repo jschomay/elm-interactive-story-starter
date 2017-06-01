@@ -1,20 +1,77 @@
 module Components exposing (..)
 
-import ClientTypes exposing (..)
-import Dict
+import Dict exposing (..)
 
 
-getDisplay : Entity -> { name : String, description : String }
-getDisplay entity =
+type alias Entity =
+    ( String, Components )
+
+
+type alias Components =
+    Dict String Component
+
+
+type Component
+    = DisplayInformation { name : String, description : String }
+    | CSSStyle String
+    | ConnectingLocations Exits
+
+
+type alias Exits =
+    List ( Direction, String )
+
+
+type Direction
+    = North
+    | South
+    | East
+    | West
+
+
+entity : String -> Entity
+entity id =
+    ( id, Dict.empty )
+
+
+addComponent : String -> Component -> Entity -> Entity
+addComponent componentId component ( id, components ) =
+    ( id, Dict.insert componentId component components )
+
+
+
+----
+
+
+addDisplayInfo : String -> String -> Entity -> Entity
+addDisplayInfo name description =
+    addComponent "displayInfo" <| DisplayInformation { name = name, description = description }
+
+
+addCSSStyle : String -> Entity -> Entity
+addCSSStyle selector =
+    addComponent "style" <| CSSStyle selector
+
+
+addConnectingLocations : List ( Direction, String ) -> Entity -> Entity
+addConnectingLocations exits =
+    addComponent "connectedLocations" <| ConnectingLocations exits
+
+
+
+----
+
+
+getDisplayInfo : Entity -> { name : String, description : String }
+getDisplayInfo ( id, components ) =
     let
         errorMsg =
-            "Error: no Display component information found for enity id: " ++ entity.id
+            "Error: no Display component information found for enity id: " ++ id
     in
-        Dict.get "display" entity.components
+        Dict.get "displayInfo" components
             |> Maybe.andThen
                 (\c ->
                     case c of
-                        Display d ->
+                        DisplayInformation d ->
                             Just d
 
                         _ ->
@@ -23,17 +80,17 @@ getDisplay entity =
             |> Maybe.withDefault { name = errorMsg, description = errorMsg }
 
 
-getStyle : Entity -> String
-getStyle entity =
+getCSSStyle : Entity -> String
+getCSSStyle ( id, components ) =
     let
         errorMsg =
-            "Error: no Style component information found for enity id: " ++ entity.id
+            "Error: no Style component information found for enity id: " ++ id
     in
-        Dict.get "style" entity.components
+        Dict.get "style" components
             |> Maybe.andThen
                 (\c ->
                     case c of
-                        Style s ->
+                        CSSStyle s ->
                             Just s
 
                         _ ->
@@ -43,9 +100,9 @@ getStyle entity =
 
 
 getExits : Entity -> Exits
-getExits entity =
-    case Dict.get "connectedLocations" entity.components of
-        Just (ConnectedLocations exits) ->
+getExits ( id, components ) =
+    case Dict.get "connectedLocations" components of
+        Just (ConnectingLocations exits) ->
             exits
 
         _ ->

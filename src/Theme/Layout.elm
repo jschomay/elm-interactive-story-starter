@@ -25,7 +25,7 @@ view displayState =
         [ div
             [ class <|
                 "GamePage__background GamePage__background--"
-                    ++ (Components.getStyle displayState.currentLocation)
+                    ++ (Components.getCSSStyle displayState.currentLocation)
             ]
             []
         , div [ class "Layout" ]

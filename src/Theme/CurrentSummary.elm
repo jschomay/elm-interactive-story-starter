@@ -20,9 +20,9 @@ view currentLocation props characters =
         interactableView msg entity =
             span
                 [ class "CurrentSummary__StoryElement u-selectable"
-                , onClick <| msg entity.id
+                , onClick <| msg <| Tuple.first entity
                 ]
-                [ text <| .name <| getDisplay entity ]
+                [ text <| .name <| getDisplayInfo entity ]
 
         format list =
             let
@@ -60,7 +60,7 @@ view currentLocation props characters =
     in
         div [ class "CurrentSummary", style [] ] <|
             [ h1 [ class "Current-location" ]
-                [ text <| .name <| getDisplay currentLocation ]
+                [ text <| .name <| getDisplayInfo currentLocation ]
             ]
                 ++ if isEmpty then
                     [ text "Nothing here." ]

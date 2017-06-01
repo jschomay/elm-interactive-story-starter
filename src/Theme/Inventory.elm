@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ClientTypes exposing (..)
 import Components exposing (..)
+import Tuple
 
 
 view :
@@ -19,14 +20,14 @@ view items =
         inventoryItem i entity =
             let
                 key =
-                    (toString entity.id) ++ (toString <| numItems - i)
+                    (toString <| Tuple.first entity) ++ (toString <| numItems - i)
             in
                 ( key
                 , li
                     [ class "Inventory__Item u-selectable"
-                    , onClick <| Interact entity.id
+                    , onClick <| Interact <| Tuple.first entity
                     ]
-                    [ text <| .name <| getDisplay entity ]
+                    [ text <| .name <| getDisplayInfo entity ]
                 )
     in
         div [ class "Inventory" ]

@@ -1,9 +1,10 @@
 port module Main exposing (..)
 
 import Engine exposing (..)
-import Manifest exposing (..)
+import Manifest
 import Rules exposing (rulesData)
 import Html exposing (..)
+import Tuple
 import Theme.Layout
 import ClientTypes exposing (..)
 import Components exposing (..)
@@ -14,9 +15,53 @@ import List.Zipper as Zipper exposing (Zipper)
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
-    , storyLine : List StorySnippet
+    , storyLine :
+        List StorySnippet
+        -- TODO store rules as entities with stateful narrative instead of content
     , content : Dict String (Maybe (Zipper String))
     }
+
+
+init : ( Model, Cmd ClientTypes.Msg )
+init =
+    let
+        startingState =
+            [ moveTo "cottage"
+            , addLocation "cottage"
+            , addLocation "river"
+            , addLocation "woods"
+            , addLocation "grandmasHouse"
+            , moveItemToLocation "cape" "cottage"
+            , moveItemToLocation "basket" "cottage"
+            , moveCharacterToLocation "lrrh" "cottage"
+            , moveCharacterToLocation "mother" "cottage"
+            , moveCharacterToLocation "wolf" "woods"
+            , moveCharacterToLocation "grandma" "grandmasHouse"
+            ]
+    in
+        ( { engineModel =
+                Engine.init
+                    { items = getIds Manifest.items
+                    , locations = getIds Manifest.locations
+                    , characters = getIds Manifest.characters
+                    }
+                    pluckRules
+                    |> Engine.changeWorld startingState
+          , loaded = False
+          , storyLine =
+                [ { interactableName = "Mother"
+                  , interactableCssSelector = ""
+                  , narrative = """
+Once upon a time there was a young girl named Little Red Riding Hood, because she was so fond of her red cape that her grandma gave to her.
+
+One day, her mother said to her, "Little Red Riding Hood, take this basket of food to your Grandma, who lives in the woods, because she is not feeling well.  And remember, don't talk to strangers on the way!"
+"""
+                  }
+                ]
+          , content = pluckContent
+          }
+        , Cmd.none
+        )
 
 
 main : Program Never Model ClientTypes.Msg
@@ -29,19 +74,25 @@ main =
         }
 
 
-getIds : List Entity -> List Id
+getIds : List Entity -> List String
 getIds =
-    List.map .id
+    List.map Tuple.first
 
 
-findEntity : Id -> Entity
+
+-- TODO turn into dict
+
+
+entities : List Entity
+entities =
+    Manifest.items ++ Manifest.locations ++ Manifest.characters
+
+
+findEntity : String -> Entity
 findEntity id =
     let
-        interactables =
-            items ++ locations ++ characters
-
         entity =
-            List.head <| List.filter (.id >> (==) id) interactables
+            List.head <| List.filter (Tuple.first >> (==) id) entities
     in
         case entity of
             Just entity ->
@@ -49,6 +100,10 @@ findEntity id =
 
             Nothing ->
                 Debug.crash <| "Couldn't find entity from id: " ++ id
+
+
+
+--TODO make rules follow ECS pattern and use `getRule`
 
 
 pluckRules : Engine.Rules
@@ -71,6 +126,10 @@ pluckRules =
         Tuple.second <| List.foldl foldFn ( 1, Dict.empty ) rulesData
 
 
+
+--TODO make rules follow ECS pattern and use `getNarrative`
+
+
 pluckContent : Dict String (Maybe (Zipper String))
 pluckContent =
     let
@@ -88,49 +147,6 @@ pluckContent =
         Tuple.second <| List.foldl foldFn ( 1, Dict.empty ) rulesData
 
 
-init : ( Model, Cmd ClientTypes.Msg )
-init =
-    let
-        startingState =
-            [ moveTo "Cottage"
-            , loadScene "start"
-            , addLocation "Cottage"
-            , addLocation "River"
-            , addLocation "Woods"
-            , addLocation "Grandma's house"
-            , moveItemToLocation "Cape" "Cottage"
-            , moveItemToLocation "Basket of food" "Cottage"
-            , moveCharacterToLocation "Little Red Riding Hood" "Cottage"
-            , moveCharacterToLocation "Mother" "Cottage"
-            , moveCharacterToLocation "Wolf" "Woods"
-            , moveCharacterToLocation "Grandma" "Grandma's house"
-            ]
-    in
-        ( { engineModel =
-                Engine.init
-                    { items = getIds items
-                    , locations = getIds locations
-                    , characters = getIds characters
-                    }
-                    pluckRules
-                    |> Engine.changeWorld startingState
-          , loaded = False
-          , storyLine =
-                [ { interactableName = "Mother"
-                  , interactableCssSelector = ""
-                  , narrative = """
-Once upon a time there was a young girl named Little Red Riding Hood, because she was so fond of her red cape that her grandma gave to her.
-
-One day, her mother said to her, "Little Red Riding Hood, take this basket of food to your Grandma, who lives in the woods, because she is not feeling well.  And remember, don't talk to strangers on the way!"
-"""
-                  }
-                ]
-          , content = pluckContent
-          }
-        , Cmd.none
-        )
-
-
 update :
     ClientTypes.Msg
     -> Model
@@ -146,11 +162,11 @@ update msg model =
                         Engine.update interactableId model.engineModel
 
                     narrative =
-                        { interactableName = findEntity interactableId |> getDisplay |> .name
-                        , interactableCssSelector = findEntity interactableId |> getStyle
+                        { interactableName = findEntity interactableId |> getDisplayInfo |> .name
+                        , interactableCssSelector = findEntity interactableId |> getCSSStyle
                         , narrative =
                             getNarrative model.content maybeMatchedRuleId
-                                |> Maybe.withDefault (findEntity interactableId |> getDisplay |> .description)
+                                |> Maybe.withDefault (findEntity interactableId |> getDisplayInfo |> .description)
                         }
 
                     updatedContent =
