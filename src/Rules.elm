@@ -1,237 +1,314 @@
-module Rules exposing (rulesData)
+module Rules exposing (..)
 
 import Engine exposing (..)
-import ClientTypes exposing (..)
+import Components exposing (..)
+import Dict exposing (Dict)
+import Narrative
 
 
-rulesData : List (RuleData Engine.Rule)
-rulesData =
-    { summary = "leaving without cape"
-    , interaction = withAnyLocation
-    , conditions =
-        [ currentLocationIs "cottage"
-        , itemIsNotInInventory "cape"
-        ]
-    , changes =
+{-| This specifies the initial story world model.  At a minimum, you need to set a starting location with the `moveTo` command.  You may also want to place various items and characters in different locations.  You can also specify a starting scene if required.
+-}
+startingState : List Engine.ChangeWorldCommand
+startingState =
+    [ moveTo "cottage"
+    , moveItemToLocation "cape" "cottage"
+    , moveItemToLocation "basket" "cottage"
+    , moveCharacterToLocation "lrrh" "cottage"
+    , moveCharacterToLocation "mother" "cottage"
+    , moveCharacterToLocation "wolf" "woods"
+    , moveCharacterToLocation "grandma" "grandmasHouse"
+    ]
+
+
+{-| A simple helper for making rules, since I want all of my rules to include RuleData and Narrative components.
+-}
+rule : String -> Engine.Rule -> List String -> Entity
+rule id ruleData narrative =
+    entity id
+        |> addRuleData ruleData
+        |> addNarrative narrative
+
+
+{-| All of the rules that govern your story.  The first parameter to `rule` is an id for that rule.  It must be unique, but generally isn't used directly anywhere else (though it gets returned from `Engine.update`, so you could do some special behavior if a specific rule matches).  I like to write a short summary of what the rule is for as the id to help me easily identify them.
+Also, order does not matter, but I like to organize the rules by the story objects they are triggered by.  This makes it easier to ensure I have set up the correct criteria so the right rule will match at the right time.
+Note that the ids used in the rules must match the ids set in `Manifest.elm`.
+-}
+rules : Dict String Components
+rules =
+    Dict.fromList <|
         []
-    , narrative =
-        [ """
-"Oh Little Red Riding Hood," her mother called out, "don't forget your cape.  It might be cold in the woods."
-"""
-        ]
-    }
-        :: { summary = "leaving without basket"
-           , interaction = withAnyLocation
-           , conditions =
-                [ currentLocationIs "cottage"
-                , itemIsNotInInventory "basket"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
- "Oh Little Red Riding Hood," her mother called out, "don't forget the basket of food to bring to Grandma!"
-"""
-                ]
-           }
-        :: { summary = "describe cottage"
-           , interaction = with "cottage"
-           , conditions =
-                [ currentLocationIs "cottage"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
-The cottage where Little Red Riding Hood and her mother live.
-"""
-                ]
-           }
-        :: { summary = "trying to jump directly from Cottage to Grandma's house"
-           , interaction = with "grandmasHouse"
-           , conditions =
-                [ currentLocationIs "cottage"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
-The way to Grandma's house is over the river and through the woods.
-"""
-                ]
-           }
-        :: { summary = "trying to jump directly from River to Grandma's house"
-           , interaction = with "grandmasHouse"
-           , conditions =
-                [ currentLocationIs "river"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
-The way to Grandma's house is through the woods.
-"""
-                ]
-           }
-        :: { summary = "trying to jump directly from Cottage to Woods"
-           , interaction = with "woods"
-           , conditions =
-                [ currentLocationIs "cottage"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
-The woods are on the other side of the river.
-"""
-                ]
-           }
-        :: { summary = "going back to the Cottage"
-           , interaction = with "cottage"
-           , conditions =
-                [ currentLocationIsNot "cottage"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
-Little Red Riding Hood knew that her mother would be cross if she did not bring the basket of food to Grandma.
-"""
-                ]
-           }
-        :: { summary = "leaving the Cottage"
-           , interaction = with "river"
-           , conditions =
-                [ currentLocationIs "cottage"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                ]
-           , changes =
-                [ moveTo "river"
-                , moveCharacterToLocation "lrrh" "river"
-                ]
-           , narrative =
-                [ """
-Little Red Riding Hood skipped out of the cottage, singing a happy song and swinging the basket of food by her side.  Soon she arrived at the old bridge that went over the river.  On the other side of the bridge were the woods where Grandma lived.
-"""
-                ]
-           }
-        :: { summary = "going from Woods to River"
-           , interaction = with "river"
-           , conditions =
-                [ currentLocationIs "woods"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                ]
-           , changes =
-                []
-           , narrative =
-                [ """
-Grandma's house is the other direction.
-"""
-                , """
-The wolf was still there, trying to hide the hungry look in his eye.
-"""
-                ]
-           }
-        :: { summary = "entering the Woods"
-           , interaction = with "woods"
-           , conditions =
-                [ currentLocationIs "river"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                , characterIsInLocation "wolf" "woods"
-                ]
-           , changes =
-                [ moveTo "woods"
-                , moveCharacterToLocation "lrrh" "woods"
-                ]
-           , narrative =
-                [ """
-Little Red Riding Hood followed the path deep into the woods.  Birds chirped in the trees high above, and squirrels scampered up the trunks, looking for nuts.  Little Red Riding Hood loved the woods and all of the animals that lived there.
-
-At first, Little Red Riding Hood did not see the wolf spying on her in the shadows, looking at her basket of food and licking his chops.  He was a crafty wolf, and came up with a plan.
-
-Putting on his best smile, the wolf greeted Little Red Riding Hood.  "Good morning my pretty child.  What a lovely cape you have on.  May I ask, where are you going with that delicious looking basket of food?"
-"""
-                ]
-           }
-        :: { summary = "ignoring the wolf"
-           , interaction = with "grandmasHouse"
-           , conditions =
-                [ currentLocationIs "woods"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                , characterIsInLocation "wolf" "woods"
-                ]
-           , changes =
-                [ moveTo "grandmasHouse"
-                , moveCharacterToLocation "lrrh" "grandmasHouse"
-                , endStory "The End"
-                ]
-           , narrative =
-                [ """
-Little Red Riding Hood remembered her mother's warning about not talking to strangers, and hurried away to Grandma's house.
-
-Grandma was so happy to see Little Red Riding Hood, and they ate the goodies she had brought, and everyone lived happily ever after.
-"""
-                ]
-           }
-        :: { summary = "talking to the wolf in the Woods"
-           , interaction = with "wolf"
-           , conditions =
-                [ currentLocationIs "woods"
-                , itemIsInInventory "cape"
-                , itemIsInInventory "basket"
-                , characterIsInLocation "wolf" "woods"
-                ]
-           , changes =
-                [ moveCharacterToLocation "wolf" "grandmasHouse"
-                , moveCharacterOffScreen "grandma"
-                ]
-           , narrative =
-                [ """
-Little Red Riding Hood thought the wolf looked so kind and so friendly that she happily told him, "I'm going to visit Grandma, who lives in these woods.  She isn't feeling well, so I am bringing her a basket of food."
-
-The wolf muttered "That's very interesting.  I hope she feels better soon."  Then he made a funny little bow and scampered off down the path.
-"""
-                ]
-           }
-        :: { summary = "finding the wolf at Grandma's house"
-           , interaction = with "grandmasHouse"
-           , conditions =
-                [ currentLocationIs "woods"
-                , characterIsInLocation "wolf" "grandmasHouse"
-                ]
-           , changes =
-                [ moveTo "grandmasHouse"
-                , moveCharacterToLocation "lrrh" "grandmasHouse"
-                , endStory "The End"
-                ]
-           , narrative =
-                [ """
-Little Red Riding Hood found the door to Grandma's house unlocked, so she went in.  She saw Grandma sleeping in the bed with the covers pulled high over her face, and her nightcap pulled low over her forehead.
-
-But she looked a little different than usual.  Little Red Riding Hood did not know that the wolf had ran to Grandma's house before her, and eaten Grandma up, and was now lying in her bed pretending to be Grandma!
-
-"Grandma, what big eyes you have."
-
-"The better to see you with, my dear," said the wolf, as softly as he could.
-
-"And Grandma, what big ears you have."
-
-"The better to hear you with, my dear."
-
-"And Grandma, what big teeth you have!"
-
-"The better to gobble you up with!"  And the wolf jumped out of bed and that is exactly what he did.  And that is why we don't talk to strangers.
-"""
-                ]
-           }
-        :: []
+            ++ -- cottage
+               [ rule "going back to the Cottage"
+                    { interaction = with "cottage"
+                    , conditions =
+                        [ currentLocationIsNot "cottage"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.returningToCottage
+               ]
+            ++ -- grandmas house
+               [ rule "ignoring the wolf"
+                    { interaction = with "grandmasHouse"
+                    , conditions =
+                        [ currentLocationIs "woods"
+                        , hasNotPreviouslyInteractedWith "wolf"
+                        ]
+                    , changes =
+                        [ moveTo "grandmasHouse"
+                        , moveCharacterToLocation "lrrh" "grandmasHouse"
+                        ]
+                    }
+                    Narrative.ignoreWolf
+               , rule "finding the wolf at Grandma's house"
+                    { interaction = with "grandmasHouse"
+                    , conditions =
+                        [ currentLocationIs "woods"
+                        , characterIsInLocation "wolf" "grandmasHouse"
+                        ]
+                    , changes =
+                        [ moveTo "grandmasHouse"
+                        , moveCharacterToLocation "lrrh" "grandmasHouse"
+                        ]
+                    }
+                    Narrative.findWolfAtGrandmas
+               ]
+            ++ -- woods
+               [ rule "entering the Woods"
+                    { interaction = with "woods"
+                    , conditions =
+                        [ currentLocationIs "river"
+                        , characterIsInLocation "wolf" "woods"
+                        ]
+                    , changes =
+                        [ moveTo "woods"
+                        , moveCharacterToLocation "lrrh" "woods"
+                        ]
+                    }
+                    Narrative.enteringWoods
+               ]
+            ++ -- river
+               [ rule "leaving cottage without cape"
+                    { interaction = with "river"
+                    , conditions =
+                        [ currentLocationIs "cottage"
+                        , itemIsNotInInventory "cape"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.leavingWithoutCape
+               , rule "leaving cottage without basket"
+                    { interaction = with "river"
+                    , conditions =
+                        [ currentLocationIs "cottage"
+                        , itemIsNotInInventory "basket"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.leavingWithoutBasket
+               , rule "leaving the Cottage"
+                    { interaction = with "river"
+                    , conditions =
+                        [ currentLocationIs "cottage"
+                        , itemIsInInventory "cape"
+                        , itemIsInInventory "basket"
+                        ]
+                    , changes =
+                        [ moveTo "river"
+                        , moveCharacterToLocation "lrrh" "river"
+                        ]
+                    }
+                    Narrative.leavingCottage
+               , rule "going from Woods to River"
+                    { interaction = with "river"
+                    , conditions =
+                        [ currentLocationIs "woods"
+                        , itemIsInInventory "cape"
+                        , itemIsInInventory "basket"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.returningToRiver
+               ]
+            ++ -- wolf
+               [ rule "talking to the wolf in the Woods"
+                    { interaction = with "wolf"
+                    , conditions =
+                        [ currentLocationIs "woods"
+                        , characterIsInLocation "wolf" "woods"
+                        ]
+                    , changes =
+                        [ moveCharacterToLocation "wolf" "grandmasHouse"
+                        , moveCharacterOffScreen "grandma"
+                        ]
+                    }
+                    Narrative.talkToWolf
+               , rule "Little Red Riding Hood's demise"
+                    { interaction = with "wolf"
+                    , conditions =
+                        [ currentLocationIs "grandmasHouse"
+                        , characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "wolf" "grandmasHouse"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.demise
+               ]
+            ++ -- mother
+               [ rule "further talking to mother"
+                    { interaction = with "mother"
+                    , conditions =
+                        []
+                    , changes =
+                        []
+                    }
+                    Narrative.talkToMother
+               ]
+            ++ -- grandma
+               [ rule "sharing food with grandma"
+                    { interaction = with "grandma"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "grandma" "grandmasHouse"
+                        , itemIsInInventory "basket"
+                        ]
+                    , changes =
+                        [ endStory "The End"
+                        ]
+                    }
+                    Narrative.sharingFoodWithGrandma
+               ]
+            ++ -- Little Red Riding Hood
+               [ rule "excited to visit grandma"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "cottage" ]
+                    , changes =
+                        []
+                    }
+                    Narrative.excitedToVisitGrandma
+               , rule "dallying"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "cottage"
+                        , itemIsInInventory "basket"
+                        , itemIsInInventory "cape"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.dallying
+               , rule "crossing the river"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "river" ]
+                    , changes =
+                        []
+                    }
+                    Narrative.crossingTheRiver
+               , rule "in the woods"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "woods" ]
+                    , changes =
+                        []
+                    }
+                    Narrative.inTheWoods
+               , rule "surprised by the wolf"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "woods"
+                        , characterIsInLocation "wolf" "woods"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.surprisedByWolf
+               , rule "realizing her mistake"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "woods"
+                        , characterIsInLocation "wolf" "grandmasHouse"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.realizingMistake
+               , rule "happy to see Grandma"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "grandma" "grandmasHouse"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.happyToSeeGrandma
+               , rule "confused by wolf in grandma's bed"
+                    { interaction = with "lrrh"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "wolf" "grandmasHouse"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.confusedByWolf
+               ]
+            ++ -- basket
+               [ rule "taking basket"
+                    { interaction = with "basket"
+                    , conditions =
+                        [ itemIsInLocation "basket" "cottage" ]
+                    , changes =
+                        [ moveItemToInventory "basket" ]
+                    }
+                    Narrative.takeBasket
+               , rule "giving basket of food to grandma"
+                    { interaction = with "basket"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "grandma" "grandmasHouse"
+                        , itemIsInInventory "basket"
+                        ]
+                    , changes =
+                        [ endStory "The End"
+                        ]
+                    }
+                    Narrative.sharingFoodWithGrandma
+               , rule "forgetting about the baseket"
+                    { interaction = with "basket"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "wolf" "grandmasHouse"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.forgettingBasket
+               ]
+            ++ -- cape
+               [ rule "taking cape"
+                    { interaction = with "cape"
+                    , conditions =
+                        [ itemIsInLocation "cape" "cottage" ]
+                    , changes =
+                        [ moveItemToInventory "cape" ]
+                    }
+                    Narrative.takeCape
+               , rule "shivering"
+                    { interaction = with "cape"
+                    , conditions =
+                        [ characterIsInLocation "lrrh" "grandmasHouse"
+                        , characterIsInLocation "wolf" "grandmasHouse"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.shivering
+               ]

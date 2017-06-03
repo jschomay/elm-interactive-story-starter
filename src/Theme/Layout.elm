@@ -21,12 +21,10 @@ view :
     }
     -> Html Msg
 view displayState =
-    div [ class <| "GamePage" ]
+    div [ class <| "GamePage GamePage--" ++ Components.getClassName displayState.currentLocation ]
         [ div
-            [ class <|
-                "GamePage__background GamePage__background--"
-                    ++ (Components.getCSSStyle displayState.currentLocation)
-            ]
+            -- this is useful if you want to add a full-screen background image via the ClassName component
+            [ class <| "GamePage__background GamePage__background--" ++ Components.getClassName displayState.currentLocation ]
             []
         , div [ class "Layout" ]
             [ div [ class "Layout__Main" ] <|

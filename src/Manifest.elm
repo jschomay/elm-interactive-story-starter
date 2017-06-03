@@ -3,6 +3,11 @@ module Manifest exposing (items, locations, characters)
 import Components exposing (..)
 
 
+{- Here is where you define your manifest -- all of the items, characters, and locations in your story. You can add what ever components you wish to each entity.  Note that the first argument to `entity` is the id for that entity, which is the id you must refer to in your rules.
+   In the current theme, the description in the display info component is only used as a fallback narrative if a rule does not match with a more specific narrative when interacting with that story object.
+-}
+
+
 items : List Entity
 items =
     [ entity "cape"
@@ -30,12 +35,16 @@ locations =
     [ entity "cottage"
         |> addDisplayInfo "Cottage" "The cottage where Little Red Riding Hood and her mother live."
         |> addConnectingLocations [ ( East, "river" ) ]
+        |> addClassName "cottage"
     , entity "river"
         |> addDisplayInfo "River" "A river that runs by Little Red Riding Hood's cottage."
         |> addConnectingLocations [ ( West, "cottage" ), ( East, "woods" ) ]
+        |> addClassName "river"
     , entity "woods"
         |> addDisplayInfo "Woods" "The forests that surround Little Red Riding Hood's cottage."
         |> addConnectingLocations [ ( West, "river" ), ( East, "grandmasHouse" ) ]
+        |> addClassName "woods"
     , entity "grandmasHouse"
         |> addDisplayInfo "Grandma's house" "The cabin in the woods where Grandma lives alone."
+        |> addClassName "grandmasHouse"
     ]
