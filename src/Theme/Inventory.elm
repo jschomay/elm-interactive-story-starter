@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import ClientTypes exposing (..)
 import Components exposing (..)
 import Tuple
+import String
 
 
 view :
@@ -20,7 +21,7 @@ view items =
         inventoryItem i entity =
             let
                 key =
-                    (toString <| Tuple.first entity) ++ (toString <| numItems - i)
+                    (Tuple.first entity) ++ (String.fromInt <| numItems - i)
             in
                 ( key
                 , li
