@@ -1,7 +1,7 @@
 {
   "name": "interactive-story-starter",
   "description": "A starting point to build your own interactive stories using the Elm Narrative Engine",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "BSD-3-Clause",
   "author": "Jeff Schomay",
   "repository": {
