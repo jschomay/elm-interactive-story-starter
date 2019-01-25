@@ -9,6 +9,7 @@ import Html.Attributes exposing (..)
 
 import Markdown
 import ClientTypes exposing (..)
+import String
 
 
 view :
@@ -23,7 +24,7 @@ view storyLine ending =
                     List.length storyLine
 
                 key =
-                    interactableName ++ (toString <| numLines - i)
+                    interactableName ++ (String.fromInt <| numLines - i)
 
                 classes =
                     [ ( "Storyline__Item", True )

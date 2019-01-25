@@ -25,7 +25,7 @@ view exits currentLocation =
                                 , onClick <| Interact <| Tuple.first entity
                                 ]
                                 [ text <| .name <| getDisplayInfo entity ]
-                            , text <| " is to the " ++ toString direction ++ "."
+                            , text <| " is to the " ++ getDirectionName direction ++ "."
                             ]
                     )
                 |> div []

@@ -148,3 +148,11 @@ getRuleData ( id, components ) =
             , conditions = []
             , changes = []
             }
+            
+getDirectionName : Direction -> String
+getDirectionName direction =
+    case direction of
+        North -> "North"
+        South -> "South"
+        East  -> "East"
+        West  -> "West"

@@ -12,6 +12,7 @@ import Narrative
 import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
+import Browser
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -28,8 +29,8 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd ClientTypes.Msg )
-init =
+init : () -> ( Model, Cmd ClientTypes.Msg )
+init _ =
     let
         engineModel =
             Engine.init
@@ -37,13 +38,13 @@ init =
                 , locations = List.map Tuple.first Manifest.locations
                 , characters = List.map Tuple.first Manifest.characters
                 }
-                (Dict.map (curry getRuleData) Rules.rules)
+                (Dict.map (\id components -> (id, components) |> getRuleData) Rules.rules)
                 |> Engine.changeWorld Rules.startingState
     in
         ( { engineModel = engineModel
           , loaded = False
           , storyLine = [ Narrative.startingNarrative ]
-          , narrativeContent = Dict.map (curry getNarrative) Rules.rules
+          , narrativeContent = Dict.map (\id components -> (id, components) |> getNarrative) Rules.rules
           , endingCountDown = 0
           }
         , Cmd.none
@@ -171,9 +172,9 @@ subscriptions model =
     loaded <| always Loaded
 
 
-main : Program Never Model ClientTypes.Msg
+main : Program () Model ClientTypes.Msg
 main =
-    Html.program
+    Browser.element
         { init = init
         , view = view
         , update = update

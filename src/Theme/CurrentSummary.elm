@@ -58,7 +58,7 @@ view currentLocation props characters =
             else
                 span [] []
     in
-        div [ class "CurrentSummary", style [] ] <|
+        div [ class "CurrentSummary" ] <|
             [ h1 [ class "Current-location" ]
                 [ text <| .name <| getDisplayInfo currentLocation ]
             ]
