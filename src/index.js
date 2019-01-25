@@ -4,8 +4,10 @@ require( './Theme/styles/story.css' );
 require( './Theme/styles/github-markdown.css' );
 
 // inject bundled Elm app
-var Elm = require( './Main' );
-var app = Elm.Main.fullscreen();
+var {Elm} = require( './Main' );
+var app = Elm.Main.init({
+	node: document.body
+});
 
 
 // automatically set images to load through webpack manifest loader
