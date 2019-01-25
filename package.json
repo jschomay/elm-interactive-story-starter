@@ -12,7 +12,7 @@
     "start": "webpack-dev-server --hot --inline --content-base src/",
     "build": "rimraf dist && webpack",
     "watch": "webpack --watch",
-    "postinstall": "rm -rf ./elm-stuff && node_modules/elm/binwrappers/elm-package install -y"
+    "postinstall": "rm -rf ./elm-stuff"
   },
   "devDependencies": {
     "autoprefixer": "^6.3.6",
