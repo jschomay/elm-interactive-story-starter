@@ -2,7 +2,7 @@
 
 This repo contains an example story using all of the features of the [Elm Narrative Engine version 5.0](https://package.elm-lang.org/packages/jschomay/elm-narrative-engine/5.0.0/).
 
-You can read the [full API and documentation](https://package.elm-lang.org/packages/jschomay/elm-narrative-engine/5.0.0/).
+You can also try it out in a live sandbox at https://ellie-app.com/7QdZzstKG6Fa1.
 
 Follow along with developement at http://blog.elmnarrativeengine.com/.
 

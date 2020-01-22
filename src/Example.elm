@@ -4,6 +4,9 @@ module Example exposing (main)
 This is for version 5.0.0, see
 <https://package.elm-lang.org/packages/jschomay/elm-narrative-engine/5.0.0/> for full
 API documentation.
+
+You can play with this in a live sandbox at <https://ellie-app.com/7QdZzstKG6Fa1>.
+
 -}
 
 import Browser
