@@ -1,7 +1,7 @@
 # Interactive Story Starter
 
 This repo helps you get started writing non-linear interactive story games for the
-browser using the [Elm Narrative Engine](elmnarrativeengine.com).
+browser using the [Elm Narrative Engine](https://enegames.itch.io/elm-narrative-engine).
 
 The code in this repo is written in [Elm](https://elm-lang.org/), a friendly language
 that gets compiled into JavaScript.
